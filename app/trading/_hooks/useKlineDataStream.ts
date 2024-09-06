@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-interface KlineData {
+export interface KlineStreamData {
   e: string; // Event type
   E: number; // Event time
   s: string; // Symbol
@@ -31,7 +31,7 @@ interface UseKlineStreamProps {
 }
 
 const useKlineStream = ({ symbol, interval }: UseKlineStreamProps) => {
-  const [data, setData] = useState<KlineData | null>(null);
+  const [data, setData] = useState<KlineStreamData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -48,7 +48,7 @@ const useKlineStream = ({ symbol, interval }: UseKlineStreamProps) => {
 
     socket.onmessage = (event) => {
       try {
-        const parsedData: KlineData = JSON.parse(event.data);
+        const parsedData: KlineStreamData = JSON.parse(event.data);
         setData(parsedData);
       } catch (err) {
         setError("Failed to parse WebSocket message");

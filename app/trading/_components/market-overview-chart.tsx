@@ -4,6 +4,7 @@ import {
   createChart,
   CrosshairMode,
   DeepPartial,
+  ISeriesApi,
   LineStyle,
   Time,
   TimeChartOptions,
@@ -20,13 +21,18 @@ interface BarData {
   close: number;
 }
 
-interface ChartComponentProps {
+export interface ChartComponentProps {
   data: BarData[];
+  updateData: BarData | null;
 }
 
-export default function ChartComponent({ data }: ChartComponentProps) {
+export default function ChartComponent({
+  data,
+  updateData,
+}: ChartComponentProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<ReturnType<typeof createChart> | null>(null);
+  const mainSeriesRef = useRef<ISeriesApi<"Candlestick", Time> | null>(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -95,6 +101,7 @@ export default function ChartComponent({ data }: ChartComponentProps) {
     });
 
     mainSeries.setData(data);
+    mainSeriesRef.current = mainSeries;
 
     const handleResize = () => {
       chart.resize(
@@ -110,6 +117,12 @@ export default function ChartComponent({ data }: ChartComponentProps) {
       chart.remove();
     };
   }, [data]);
+
+  useEffect(() => {
+    if (updateData && mainSeriesRef.current) {
+      mainSeriesRef.current.update(updateData);
+    }
+  }, [updateData]);
 
   const handleResetZoom = () => {
     if (chartRef.current && data.length > 0) {

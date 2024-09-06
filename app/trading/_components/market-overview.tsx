@@ -7,10 +7,12 @@ import { TimeInterval } from "../_types";
 import { TimeIntervalSelection } from "./time-interval-selection";
 import { SymbolSelection } from "./symbol-selection";
 import useKlineData from "../_hooks/useKlineData";
-import useKlineDataStream from "../_hooks/useKlineDataStream";
-import { UTCTimestamp } from "lightweight-charts";
+import useKlineDataStream, {
+  KlineStreamData,
+} from "../_hooks/useKlineDataStream";
+import { BarData, Time, UTCTimestamp } from "lightweight-charts";
 
-const symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT"]; // Updated format
+const symbols = ["btcusdt", "ETHUSDT", "BNBUSDT"]; // Updated format
 
 export default function MarketOverview() {
   const [selectedSymbol, setSelectedSymbol] = useState(symbols[0]);
@@ -30,6 +32,22 @@ export default function MarketOverview() {
     symbol: selectedSymbol,
     interval: selectedInterval,
   });
+
+  function convertKlineStreamDataToBarData(
+    klineStreamData: KlineStreamData
+  ): BarData {
+    const { T, o, h, l, c } = klineStreamData.k;
+
+    const barData: BarData = {
+      time: (T / 1000) as Time,
+      open: parseFloat(o),
+      high: parseFloat(h),
+      low: parseFloat(l),
+      close: parseFloat(c),
+    };
+
+    return barData;
+  }
 
   return (
     <div className="bg-card rounded-lg p-6">
@@ -59,6 +77,11 @@ export default function MarketOverview() {
             low: Number(klineData.low),
             close: Number(klineData.close),
           }))}
+          updateData={
+            streamData
+              ? convertKlineStreamDataToBarData(streamData)
+              : streamData
+          }
         />
       )}
     </div>
