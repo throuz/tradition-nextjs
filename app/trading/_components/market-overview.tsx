@@ -3,51 +3,17 @@
 import React, { useState } from "react";
 import ChartComponent from "./market-overview-chart";
 import TimeIntervalDropdown from "./time-interval-dropdown";
-import { TimeInterval } from "../_types";
 import { TimeIntervalSelection } from "./time-interval-selection";
 import { SymbolSelection } from "./symbol-selection";
-import useKlineData from "../_hooks/useKlineData";
-import useKlineDataStream, {
-  KlineStreamData,
-} from "../_hooks/useKlineDataStream";
-import { BarData, Time, UTCTimestamp } from "lightweight-charts";
+import { TimeInterval } from "@/lib/types";
+import { useKlineStore } from "../_providers/kline-store-providers";
 
-const symbols = ["btcusdt", "ETHUSDT", "BNBUSDT"]; // Updated format
+const symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT"]; // Updated format
 
 export default function MarketOverview() {
-  const [selectedSymbol, setSelectedSymbol] = useState(symbols[0]);
-  const [selectedInterval, setSelectedInterval] = useState<TimeInterval>(
-    TimeInterval.OneDay
+  const { symbol, interval, setSymbol, setInterval } = useKlineStore(
+    (state) => state
   );
-  const { data, isLoading, isError, isSuccess } = useKlineData({
-    symbol: selectedSymbol,
-    interval: selectedInterval,
-  });
-
-  const {
-    data: streamData,
-    error: streamError,
-    loading: streamLoading,
-  } = useKlineDataStream({
-    symbol: selectedSymbol,
-    interval: selectedInterval,
-  });
-
-  function convertKlineStreamDataToBarData(
-    klineStreamData: KlineStreamData
-  ): BarData {
-    const { T, o, h, l, c } = klineStreamData.k;
-
-    const barData: BarData = {
-      time: (T / 1000) as Time,
-      open: parseFloat(o),
-      high: parseFloat(h),
-      low: parseFloat(l),
-      close: parseFloat(c),
-    };
-
-    return barData;
-  }
 
   return (
     <div className="bg-card rounded-lg p-6">
@@ -56,34 +22,15 @@ export default function MarketOverview() {
       <p className="text-muted-foreground">24h Change: +3.25%</p>
       <SymbolSelection
         symbols={symbols}
-        selectedSymbol={selectedSymbol}
-        onSelectSymbol={setSelectedSymbol}
+        selectedSymbol={symbol}
+        onSelectSymbol={setSymbol}
       />
       <TimeIntervalSelection
-        selectedInterval={selectedInterval}
-        onSelectInterval={setSelectedInterval}
+        selectedInterval={interval}
+        onSelectInterval={setInterval}
       />
       <TimeIntervalDropdown />
-      {isLoading && <div className="text-center text-gray-500">Loading...</div>}
-      {isError && (
-        <div className="text-center text-red-500">Error loading data</div>
-      )}
-      {isSuccess && (
-        <ChartComponent
-          data={data.map((klineData) => ({
-            time: (klineData.closeTime / 1000) as UTCTimestamp,
-            open: Number(klineData.open),
-            high: Number(klineData.high),
-            low: Number(klineData.low),
-            close: Number(klineData.close),
-          }))}
-          updateData={
-            streamData
-              ? convertKlineStreamDataToBarData(streamData)
-              : streamData
-          }
-        />
-      )}
+      <ChartComponent />
     </div>
   );
 }

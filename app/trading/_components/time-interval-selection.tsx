@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TimeInterval } from "../_types";
+import { TimeInterval } from "@/lib/types";
 
 interface TimeIntervalSelectionProps {
   selectedInterval: TimeInterval;

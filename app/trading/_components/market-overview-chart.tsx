@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BarData,
   createChart,
   CrosshairMode,
   DeepPartial,
@@ -9,30 +10,34 @@ import {
   Time,
   TimeChartOptions,
 } from "lightweight-charts";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useKlineStore } from "../_providers/kline-store-providers";
+import { useKlinesQuery } from "../_hooks/useKlinesQuery";
+import useKlineStream from "../_hooks/useKlineStream";
 
-interface BarData {
-  time: Time;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-}
+export default function ChartComponent() {
+  const { symbol, interval } = useKlineStore((state) => state);
+  const { data, isSuccess } = useKlinesQuery({ symbol, interval });
+  const klineStream = useKlineStream(symbol, interval);
 
-export interface ChartComponentProps {
-  data: BarData[];
-  updateData: BarData | null;
-}
-
-export default function ChartComponent({
-  data,
-  updateData,
-}: ChartComponentProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<ReturnType<typeof createChart> | null>(null);
   const mainSeriesRef = useRef<ISeriesApi<"Candlestick", Time> | null>(null);
+
+  const barDataList = useMemo<BarData[]>(() => {
+    if (isSuccess) {
+      return data.map((kline) => ({
+        time: (kline[6] / 1000) as Time,
+        open: Number(kline[1]),
+        high: Number(kline[2]),
+        low: Number(kline[3]),
+        close: Number(kline[4]),
+      }));
+    }
+    return [];
+  }, [data, isSuccess]);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -77,7 +82,7 @@ export default function ChartComponent({
       timeVisible: true,
     });
 
-    const lineData = data.map((datapoint) => ({
+    const lineData = barDataList.map((datapoint) => ({
       time: datapoint.time,
       value: (datapoint.close + datapoint.open) / 2,
     }));
@@ -100,7 +105,7 @@ export default function ChartComponent({
       borderVisible: false,
     });
 
-    mainSeries.setData(data);
+    mainSeries.setData(barDataList);
     mainSeriesRef.current = mainSeries;
 
     const handleResize = () => {
@@ -116,16 +121,24 @@ export default function ChartComponent({
       window.removeEventListener("resize", handleResize);
       chart.remove();
     };
-  }, [data]);
+  }, [barDataList]);
 
   useEffect(() => {
-    if (updateData && mainSeriesRef.current) {
-      mainSeriesRef.current.update(updateData);
+    if (klineStream && mainSeriesRef.current) {
+      const { T, o, h, l, c } = klineStream.k;
+      const barData: BarData = {
+        time: (T / 1000) as Time,
+        open: Number(o),
+        high: Number(h),
+        low: Number(l),
+        close: Number(c),
+      };
+      mainSeriesRef.current.update(barData);
     }
-  }, [updateData]);
+  }, [klineStream]);
 
   const handleResetZoom = () => {
-    if (chartRef.current && data.length > 0) {
+    if (chartRef.current && barDataList.length > 0) {
       chartRef.current.timeScale().resetTimeScale();
     }
   };

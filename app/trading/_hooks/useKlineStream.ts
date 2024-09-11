@@ -1,6 +1,7 @@
+import { TimeInterval } from "@/lib/types";
 import { useEffect, useState } from "react";
 
-export interface KlineStreamData {
+export interface KlineStream {
   e: string; // Event type
   E: number; // Event time
   s: string; // Symbol
@@ -25,42 +26,17 @@ export interface KlineStreamData {
   };
 }
 
-interface UseKlineStreamProps {
-  symbol: string;
-  interval: string;
-}
-
-const useKlineStream = ({ symbol, interval }: UseKlineStreamProps) => {
-  const [data, setData] = useState<KlineStreamData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+const useKlineStream = (symbol: string, interval: TimeInterval) => {
+  const [data, setData] = useState<KlineStream | null>(null);
 
   useEffect(() => {
-    console.log({ symbol, interval });
-
     const socket = new WebSocket(
-      `wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`
+      `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`
     );
 
-    socket.onopen = () => {
-      setLoading(false);
-    };
-
     socket.onmessage = (event) => {
-      try {
-        const parsedData: KlineStreamData = JSON.parse(event.data);
-        setData(parsedData);
-      } catch (err) {
-        setError("Failed to parse WebSocket message");
-      }
-    };
-
-    socket.onerror = (err) => {
-      setError(`WebSocket error: ${err}`);
-    };
-
-    socket.onclose = () => {
-      setLoading(true);
+      const parsedData: KlineStream = JSON.parse(event.data);
+      setData(parsedData);
     };
 
     return () => {
@@ -68,7 +44,7 @@ const useKlineStream = ({ symbol, interval }: UseKlineStreamProps) => {
     };
   }, [symbol, interval]);
 
-  return { data, error, loading };
+  return data;
 };
 
 export default useKlineStream;

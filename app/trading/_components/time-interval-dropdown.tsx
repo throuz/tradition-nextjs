@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { TimeInterval } from "../_types";
+import { TimeInterval } from "@/lib/types";
 
 const timeIntervals: TimeInterval[] = [
   TimeInterval.OneMinute,
