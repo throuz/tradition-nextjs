@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import {
   Select,
   SelectContent,
@@ -8,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { useSymbols } from "../_hooks/useSymbols";
 import { useKlineStore } from "../_providers/kline-store-providers";
 

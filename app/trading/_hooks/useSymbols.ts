@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+
 import { useExchangeInfoQuery } from "../../api/exchange-info/hooks";
 
 export const useSymbols = () => {

@@ -1,5 +1,6 @@
-import { KlinesRequestParams, KlinesResponse } from "@/app/api/klines/types";
 import { useQuery } from "@tanstack/react-query";
+
+import { KlinesRequestParams, KlinesResponse } from "@/app/api/klines/types";
 
 const fetchKlinesData = async (
   params: KlinesRequestParams

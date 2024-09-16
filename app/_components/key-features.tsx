@@ -1,5 +1,6 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Percent, DollarSign, Shield, Play } from "lucide-react";
+import { DollarSign, Percent, Play, Shield } from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const keyFeatureCards: { title: string; content: string; icon: JSX.Element }[] =
   [

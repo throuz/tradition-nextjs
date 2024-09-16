@@ -1,8 +1,10 @@
-import { useMemo } from "react";
 import { DeepPartial, PriceFormat } from "lightweight-charts";
-import { useKlineStore } from "../_providers/kline-store-providers";
+import { useMemo } from "react";
+
 import { useExchangeInfoQuery } from "@/app/api/exchange-info/hooks";
 import { FilterType } from "@/lib/types";
+
+import { useKlineStore } from "../_providers/kline-store-providers";
 
 export const useChartPriceFormat = () => {
   const symbol = useKlineStore((state) => state.symbol);

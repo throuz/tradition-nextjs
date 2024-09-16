@@ -1,5 +1,6 @@
-import { KlineInterval } from "@/lib/types";
 import { createStore } from "zustand/vanilla";
+
+import { KlineInterval } from "@/lib/types";
 
 export type KlineState = {
   symbol: string;

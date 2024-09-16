@@ -1,5 +1,6 @@
-import { KlineInterval } from "@/lib/types";
 import { useEffect, useState } from "react";
+
+import { KlineInterval } from "@/lib/types";
 
 export interface KlineStream {
   e: string; // Event type

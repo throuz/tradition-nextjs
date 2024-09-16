@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { useKlineStore } from "../_providers/kline-store-providers";
+
 import { useTickerStream } from "../../../lib/streams/useTickerStream";
+import { useKlineStore } from "../_providers/kline-store-providers";
 
 export default function SymbolTicker() {
   const { symbol } = useKlineStore((state) => state);

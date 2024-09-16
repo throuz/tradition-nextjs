@@ -1,9 +1,9 @@
 "use client";
 
-import { type ReactNode, createContext, useRef, useContext } from "react";
+import { createContext, type ReactNode, useContext, useRef } from "react";
 import { useStore } from "zustand";
 
-import { type KlineStore, createKlineStore } from "../_stores/kline-store";
+import { createKlineStore, type KlineStore } from "../_stores/kline-store";
 
 export type KlineStoreApi = ReturnType<typeof createKlineStore>;
 
@@ -28,7 +28,7 @@ export const KlineStoreProvider = ({ children }: KlineStoreProviderProps) => {
   );
 };
 
-export const useKlineStore = <T,>(selector: (store: KlineStore) => T): T => {
+export const useKlineStore = <T, >(selector: (store: KlineStore) => T): T => {
   const klineStoreContext = useContext(KlineStoreContext);
 
   if (!klineStoreContext) {

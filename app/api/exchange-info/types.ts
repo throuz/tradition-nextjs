@@ -1,11 +1,11 @@
 import {
-  ContractType,
   ContractStatus,
+  ContractType,
   OrderType,
-  TimeInForce,
-  RateLimitType,
   RateLimitInterval,
+  RateLimitType,
   SymbolFilter,
+  TimeInForce,
 } from "@/lib/types";
 
 export interface RateLimit {

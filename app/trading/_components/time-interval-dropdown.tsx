@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { KlineInterval } from "@/lib/types";
 
 const timeIntervals: KlineInterval[] = [

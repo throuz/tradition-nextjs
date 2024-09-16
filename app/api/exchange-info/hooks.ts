@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { ExchangeInfoResponse } from "@/app/api/exchange-info/types";
 
 const fetchExchangeInfo = async (): Promise<ExchangeInfoResponse> => {

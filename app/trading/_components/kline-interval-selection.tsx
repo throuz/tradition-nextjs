@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { KlineInterval } from "@/lib/types";
+
 import { useKlineStore } from "../_providers/kline-store-providers";
 
 export function KlineIntervalSelection() {

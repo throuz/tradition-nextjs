@@ -10,13 +10,15 @@ import {
   Time,
   TimeChartOptions,
 } from "lightweight-charts";
-import React, { useEffect, useRef } from "react";
 import { RefreshCcw } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+
 import { Button } from "@/components/ui/button";
-import { useKlineStore } from "../_providers/kline-store-providers";
+
 import useKlineStream from "../../../lib/streams/useKlineStream";
 import { useCandlestickDatas } from "../_hooks/useCandlestickDatas";
 import { useChartPriceFormat } from "../_hooks/useChartPriceFormat";
+import { useKlineStore } from "../_providers/kline-store-providers";
 
 export default function ChartComponent() {
   const chartContainerRef = useRef<HTMLDivElement>(null);

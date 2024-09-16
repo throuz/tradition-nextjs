@@ -1,4 +1,4 @@
-import { UserPlus, Wallet, TrendingUp } from "lucide-react";
+import { TrendingUp, UserPlus, Wallet } from "lucide-react";
 
 const steps: { title: string; description: string; icon: JSX.Element }[] = [
   {

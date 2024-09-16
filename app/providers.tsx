@@ -1,12 +1,13 @@
 "use client";
 
-import { ReactNode } from "react";
-import { ThemeProvider } from "@/components/theme-provider";
 import {
   isServer,
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { ReactNode } from "react";
+
+import { ThemeProvider } from "@/components/theme-provider";
 
 function makeQueryClient() {
   return new QueryClient({
