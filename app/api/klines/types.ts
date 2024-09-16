@@ -1,8 +1,8 @@
-import { TimeInterval } from "@/lib/types";
+import { KlineInterval } from "@/lib/types";
 
 export interface KlinesRequestParams {
   symbol: string; // Mandatory
-  interval: TimeInterval; // Enum, mandatory
+  interval: KlineInterval; // Enum, mandatory
   startTime?: number; // Optional, Unix timestamp in milliseconds
   endTime?: number; // Optional, Unix timestamp in milliseconds
   limit?: number; // Optional, default 500, max 1500

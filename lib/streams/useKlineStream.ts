@@ -1,4 +1,4 @@
-import { TimeInterval } from "@/lib/types";
+import { KlineInterval } from "@/lib/types";
 import { useEffect, useState } from "react";
 
 export interface KlineStream {
@@ -26,7 +26,7 @@ export interface KlineStream {
   };
 }
 
-const useKlineStream = (symbol: string, interval: TimeInterval) => {
+const useKlineStream = (symbol: string, interval: KlineInterval) => {
   const [data, setData] = useState<KlineStream | null>(null);
 
   useEffect(() => {

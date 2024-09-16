@@ -8,6 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSymbols } from "../_hooks/useSymbols";
+import { useKlineStore } from "../_providers/kline-store-providers";
 
 interface SymbolSelectionProps {
   symbols: string[];
@@ -15,25 +17,21 @@ interface SymbolSelectionProps {
   onSelectSymbol: (symbol: string) => void;
 }
 
-export function SymbolSelection({
-  symbols,
-  selectedSymbol,
-  onSelectSymbol,
-}: SymbolSelectionProps) {
+export function SymbolSelection() {
+  const symbols = useSymbols();
+  const { symbol, setSymbol } = useKlineStore((state) => state);
+
   return (
-    <Select onValueChange={onSelectSymbol} value={selectedSymbol}>
+    <Select onValueChange={setSymbol} value={symbol}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select a symbol" />
       </SelectTrigger>
       <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Symbols</SelectLabel>
-          {symbols.map((symbol) => (
-            <SelectItem key={symbol} value={symbol}>
-              {symbol}
-            </SelectItem>
-          ))}
-        </SelectGroup>
+        {symbols.map((symbol) => (
+          <SelectItem key={symbol} value={symbol}>
+            {symbol}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

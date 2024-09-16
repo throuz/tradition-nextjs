@@ -1,21 +1,21 @@
-import { TimeInterval } from "@/lib/types";
+import { KlineInterval } from "@/lib/types";
 import { createStore } from "zustand/vanilla";
 
 export type KlineState = {
   symbol: string;
-  interval: TimeInterval;
+  interval: KlineInterval;
 };
 
 export type KlineActions = {
   setSymbol: (symbol: string) => void;
-  setInterval: (interval: TimeInterval) => void;
+  setInterval: (interval: KlineInterval) => void;
 };
 
 export type KlineStore = KlineState & KlineActions;
 
 export const defaultKlineState: KlineState = {
   symbol: "BTCUSDT",
-  interval: TimeInterval.OneDay,
+  interval: KlineInterval.OneDay,
 };
 
 export const createKlineStore = (initState: KlineState = defaultKlineState) => {

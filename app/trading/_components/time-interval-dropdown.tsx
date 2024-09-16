@@ -8,34 +8,34 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { TimeInterval } from "@/lib/types";
+import { KlineInterval } from "@/lib/types";
 
-const timeIntervals: TimeInterval[] = [
-  TimeInterval.OneMinute,
-  TimeInterval.ThreeMinutes,
-  TimeInterval.FiveMinutes,
-  TimeInterval.FifteenMinutes,
-  TimeInterval.ThirtyMinutes,
-  TimeInterval.OneHour,
-  TimeInterval.TwoHours,
-  TimeInterval.FourHours,
-  TimeInterval.SixHours,
-  TimeInterval.EightHours,
-  TimeInterval.TwelveHours,
-  TimeInterval.OneDay,
-  TimeInterval.ThreeDays,
-  TimeInterval.OneWeek,
-  TimeInterval.OneMonth,
+const timeIntervals: KlineInterval[] = [
+  KlineInterval.OneMinute,
+  KlineInterval.ThreeMinutes,
+  KlineInterval.FiveMinutes,
+  KlineInterval.FifteenMinutes,
+  KlineInterval.ThirtyMinutes,
+  KlineInterval.OneHour,
+  KlineInterval.TwoHours,
+  KlineInterval.FourHours,
+  KlineInterval.SixHours,
+  KlineInterval.EightHours,
+  KlineInterval.TwelveHours,
+  KlineInterval.OneDay,
+  KlineInterval.ThreeDays,
+  KlineInterval.OneWeek,
+  KlineInterval.OneMonth,
 ];
 
 interface TimeIntervalDropdownProps {}
 
 export default function TimeIntervalDropdown() {
-  const [selectedInterval, setSelectedInterval] = useState<TimeInterval>(
-    TimeInterval.OneDay
+  const [selectedInterval, setSelectedInterval] = useState<KlineInterval>(
+    KlineInterval.OneDay
   );
 
-  const handleTimeIntervalChange = (interval: TimeInterval) => {
+  const handleTimeIntervalChange = (interval: KlineInterval) => {
     setSelectedInterval(interval);
     // Implement logic to update the chart based on the selected interval if needed
   };

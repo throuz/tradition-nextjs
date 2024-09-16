@@ -10,34 +10,24 @@ import {
   Time,
   TimeChartOptions,
 } from "lightweight-charts";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useKlineStore } from "../_providers/kline-store-providers";
-import { useKlinesQuery } from "../_hooks/useKlinesQuery";
-import useKlineStream from "../_hooks/useKlineStream";
+import useKlineStream from "../../../lib/streams/useKlineStream";
+import { useCandlestickDatas } from "../_hooks/useCandlestickDatas";
+import { useChartPriceFormat } from "../_hooks/useChartPriceFormat";
 
 export default function ChartComponent() {
-  const { symbol, interval } = useKlineStore((state) => state);
-  const { data, isSuccess } = useKlinesQuery({ symbol, interval });
-  const klineStream = useKlineStream(symbol, interval);
-
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<ReturnType<typeof createChart> | null>(null);
-  const mainSeriesRef = useRef<ISeriesApi<"Candlestick", Time> | null>(null);
-
-  const barDataList = useMemo<BarData[]>(() => {
-    if (isSuccess) {
-      return data.map((kline) => ({
-        time: (kline[6] / 1000) as Time,
-        open: Number(kline[1]),
-        high: Number(kline[2]),
-        low: Number(kline[3]),
-        close: Number(kline[4]),
-      }));
-    }
-    return [];
-  }, [data, isSuccess]);
+  const candlestickSeriesRef = useRef<ISeriesApi<"Candlestick", Time> | null>(
+    null
+  );
+  const chartPriceFormat = useChartPriceFormat();
+  const candlestickDatas = useCandlestickDatas();
+  const { symbol, interval } = useKlineStore((state) => state);
+  const klineStream = useKlineStream(symbol, interval);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -82,7 +72,7 @@ export default function ChartComponent() {
       timeVisible: true,
     });
 
-    const lineData = barDataList.map((datapoint) => ({
+    const areaDatas = candlestickDatas.map((datapoint) => ({
       time: datapoint.time,
       value: (datapoint.close + datapoint.open) / 2,
     }));
@@ -93,20 +83,22 @@ export default function ChartComponent() {
       lineColor: "transparent",
       topColor: "#38216e99",
       bottomColor: "#38216e1a",
+      priceFormat: chartPriceFormat,
     });
 
-    areaSeries.setData(lineData);
+    areaSeries.setData(areaDatas);
 
-    const mainSeries = chart.addCandlestickSeries({
+    const candlestickSeries = chart.addCandlestickSeries({
       wickUpColor: "#3674d9",
       upColor: "#3674d9",
       wickDownColor: "#e13255",
       downColor: "#e13255",
       borderVisible: false,
+      priceFormat: chartPriceFormat,
     });
 
-    mainSeries.setData(barDataList);
-    mainSeriesRef.current = mainSeries;
+    candlestickSeries.setData(candlestickDatas);
+    candlestickSeriesRef.current = candlestickSeries;
 
     const handleResize = () => {
       chart.resize(
@@ -121,10 +113,10 @@ export default function ChartComponent() {
       window.removeEventListener("resize", handleResize);
       chart.remove();
     };
-  }, [barDataList]);
+  }, [candlestickDatas, chartPriceFormat]);
 
   useEffect(() => {
-    if (klineStream && mainSeriesRef.current) {
+    if (klineStream && candlestickSeriesRef.current) {
       const { T, o, h, l, c } = klineStream.k;
       const barData: BarData = {
         time: (T / 1000) as Time,
@@ -133,12 +125,12 @@ export default function ChartComponent() {
         low: Number(l),
         close: Number(c),
       };
-      mainSeriesRef.current.update(barData);
+      candlestickSeriesRef.current.update(barData);
     }
   }, [klineStream]);
 
   const handleResetZoom = () => {
-    if (chartRef.current && barDataList.length > 0) {
+    if (chartRef.current && candlestickDatas.length > 0) {
       chartRef.current.timeScale().resetTimeScale();
     }
   };

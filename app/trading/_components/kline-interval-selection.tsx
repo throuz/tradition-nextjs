@@ -1,30 +1,21 @@
-import * as React from "react";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { KlineInterval } from "@/lib/types";
+import { useKlineStore } from "../_providers/kline-store-providers";
 
-interface TimeIntervalSelectionProps {
-  selectedInterval: KlineInterval;
-  onSelectInterval: (interval: KlineInterval) => void;
-}
-
-export function TimeIntervalSelection({
-  selectedInterval,
-  onSelectInterval,
-}: TimeIntervalSelectionProps) {
+export function KlineIntervalSelection() {
   const intervals = Object.values(KlineInterval);
+  const { interval, setInterval } = useKlineStore((state) => state);
 
   return (
     <Select
-      onValueChange={(value) => onSelectInterval(value as KlineInterval)}
-      value={selectedInterval}
+      onValueChange={(value) => setInterval(value as KlineInterval)}
+      value={interval}
     >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select a time interval" />
