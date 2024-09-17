@@ -28,7 +28,7 @@ export const KlineStoreProvider = ({ children }: KlineStoreProviderProps) => {
   );
 };
 
-export const useKlineStore = <T, >(selector: (store: KlineStore) => T): T => {
+export const useKlineStore = <T,>(selector: (store: KlineStore) => T): T => {
   const klineStoreContext = useContext(KlineStoreContext);
 
   if (!klineStoreContext) {
