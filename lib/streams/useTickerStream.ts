@@ -26,7 +26,7 @@ export const useTickerStream = (symbol: string) => {
 
   useEffect(() => {
     const socket = new WebSocket(
-      `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@ticker`
+      `wss://fstream.binance.com/ws/${symbol.toLowerCase()}@ticker`
     );
 
     socket.onmessage = (event) => {

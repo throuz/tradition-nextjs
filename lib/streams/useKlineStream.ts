@@ -32,7 +32,7 @@ const useKlineStream = (symbol: string, interval: KlineInterval) => {
 
   useEffect(() => {
     const socket = new WebSocket(
-      `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`
+      `wss://fstream.binance.com/ws/${symbol.toLowerCase()}@kline_${interval}`
     );
 
     socket.onmessage = (event) => {

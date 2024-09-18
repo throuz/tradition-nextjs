@@ -11,7 +11,7 @@ import {
   TimeChartOptions,
 } from "lightweight-charts";
 import { RefreshCcw } from "lucide-react";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -27,6 +27,8 @@ export default function ChartComponent() {
     null
   );
   const chartPriceFormat = useChartPriceFormat();
+  console.log(chartPriceFormat);
+
   const candlestickDatas = useCandlestickDatas();
   const { symbol, interval } = useKlineStore((state) => state);
   const klineStream = useKlineStream(symbol, interval);
