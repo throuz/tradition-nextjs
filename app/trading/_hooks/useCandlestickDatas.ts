@@ -10,6 +10,7 @@ export const useCandlestickDatas = () => {
   const { data, isSuccess } = useKlinesQuery({
     symbol,
     interval,
+    limit: 1500,
   });
 
   const candlestickDatas = useMemo<CandlestickData[]>(() => {
