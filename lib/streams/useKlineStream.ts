@@ -41,6 +41,7 @@ const useKlineStream = (symbol: string, interval: KlineInterval) => {
     };
 
     return () => {
+      setData(null);
       socket.close();
     };
   }, [symbol, interval]);

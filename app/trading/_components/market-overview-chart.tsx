@@ -27,7 +27,6 @@ export default function ChartComponent() {
     null
   );
   const chartPriceFormat = useChartPriceFormat();
-  console.log(chartPriceFormat);
 
   const candlestickDatas = useCandlestickDatas();
   const { symbol, interval } = useKlineStore((state) => state);
