@@ -6,13 +6,6 @@ import { FilterType } from "@/lib/types";
 
 import { useKlineStore } from "../_providers/kline-store-providers";
 
-const getDecimalPrecision = (value: number): number => {
-  const valueStr = value.toString();
-  const decimalIndex = valueStr.indexOf(".");
-  if (decimalIndex === -1) return 0;
-  return valueStr.length - decimalIndex - 1;
-};
-
 export const useChartPriceFormat = () => {
   const symbol = useKlineStore((state) => state.symbol);
   const { data, isSuccess } = useExchangeInfoQuery();
@@ -27,8 +20,7 @@ export const useChartPriceFormat = () => {
           (item) => item.filterType === FilterType.PriceFilter
         )?.tickSize
       );
-      const precision = getDecimalPrecision(minMove);
-      return { type: "price", precision, minMove };
+      return { type: "price", minMove };
     }
     return {};
   }, [data, isSuccess, symbol]);
