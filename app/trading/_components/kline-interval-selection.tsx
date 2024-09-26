@@ -14,20 +14,23 @@ export function KlineIntervalSelection() {
   const { interval, setInterval } = useKlineStore((state) => state);
 
   return (
-    <Select
-      onValueChange={(value) => setInterval(value as KlineInterval)}
-      value={interval}
-    >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select a time interval" />
-      </SelectTrigger>
-      <SelectContent>
-        {intervals.map((interval) => (
-          <SelectItem key={interval} value={interval}>
-            {interval}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex gap-2 items-center">
+      <div>Time:</div>
+      <Select
+        onValueChange={(value) => setInterval(value as KlineInterval)}
+        value={interval}
+      >
+        <SelectTrigger className="w-[80px]">
+          <SelectValue placeholder="Select a time interval" />
+        </SelectTrigger>
+        <SelectContent>
+          {intervals.map((interval) => (
+            <SelectItem key={interval} value={interval}>
+              {interval}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

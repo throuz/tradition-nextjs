@@ -32,13 +32,13 @@ export function SymbolSelection() {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="justify-between text-2xl font-semibold"
         >
           {symbol || "Select a symbol"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="p-0">
         <Command>
           <CommandInput placeholder="Search symbol..." />
           <CommandList>

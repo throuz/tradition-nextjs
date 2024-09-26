@@ -4,6 +4,7 @@ import { useMemo } from "react";
 
 import { useTickerStream } from "../../../lib/streams/useTickerStream";
 import { useKlineStore } from "../_providers/kline-store-providers";
+import { SymbolSelection } from "./symbol-selection";
 
 export default function SymbolTicker() {
   const { symbol } = useKlineStore((state) => state);
@@ -19,10 +20,10 @@ export default function SymbolTicker() {
   }, [tickerStream?.P]);
 
   return (
-    <div className="bg-card rounded-lg p-6">
-      <h2 className="text-2xl font-semibold mb-4">{symbol}</h2>
-      <div className="text-4xl font-bold mb-2">${lastPrice}</div>
-      <p className="text-muted-foreground">24h Change: {priceChange}%</p>
+    <div className="flex items-center gap-4">
+      <SymbolSelection />
+      <div className="text-2xl font-bold">${lastPrice}</div>
+      <div className="text-muted-foreground">24h Change: {priceChange}%</div>
     </div>
   );
 }
