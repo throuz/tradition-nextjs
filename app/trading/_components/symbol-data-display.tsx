@@ -15,7 +15,9 @@ export default function SymbolDataDisplay() {
         <SymbolTicker />
       </CardHeader>
       <CardContent>
-        <KlineIntervalSelection />
+        <div className="mb-2">
+          <KlineIntervalSelection />
+        </div>
         <ChartComponent />
       </CardContent>
     </Card>
