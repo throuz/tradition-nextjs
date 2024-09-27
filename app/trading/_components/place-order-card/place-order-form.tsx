@@ -25,10 +25,17 @@ import { OrderSide } from "@/lib/types";
 const formSchema = z.object({
   leverage: z.coerce
     .number()
-    .min(1, { message: "Leverage must be at least 1." }),
-  amount: z.coerce.number().min(1, { message: "Amount must be at least 1." }),
-  takeProfit: z.coerce.number().optional(),
-  stopLoss: z.coerce.number().optional(),
+    .int({ message: "Leverage must be an integer." })
+    .min(1, { message: "Leverage must be at least 1." })
+    .max(100, { message: "Leverage cannot exceed 100." }),
+  amount: z.coerce
+    .number()
+    .min(0.01, { message: "Amount must be at least 0.01." })
+    .refine((value) => Number(value.toFixed(2)) === value, {
+      message: "Amount can have at most 2 decimal places.",
+    }),
+  takeProfitPrice: z.coerce.number().optional(),
+  stopLossPrice: z.coerce.number().optional(),
   orderSide: z.nativeEnum(OrderSide, {
     errorMap: () => ({ message: "Invalid order side" }),
   }),
@@ -40,10 +47,10 @@ export function PlaceOrderForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      leverage: 1,
+      leverage: "" as unknown as number,
       amount: "" as unknown as number,
-      takeProfit: "" as unknown as number,
-      stopLoss: "" as unknown as number,
+      takeProfitPrice: "" as unknown as number,
+      stopLossPrice: "" as unknown as number,
       orderSide: OrderSide.Buy,
     },
   });
@@ -60,7 +67,7 @@ export function PlaceOrderForm() {
       >
         <div className="mb-4">
           <span className="block mb-1">
-            Available Balance: ${availableBalance}
+            Available Balance: ${availableBalance.toFixed(2)}
           </span>
         </div>
 
@@ -93,21 +100,7 @@ export function PlaceOrderForm() {
             <FormItem>
               <FormLabel>Leverage</FormLabel>
               <FormControl>
-                <Select
-                  value={String(field.value)}
-                  onValueChange={(value) => field.onChange(Number(value))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select leverage" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[1, 2, 3, 5, 10].map((lev) => (
-                      <SelectItem key={lev} value={String(lev)}>
-                        {lev}x
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input type="number" placeholder="Enter leverage" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -130,10 +123,10 @@ export function PlaceOrderForm() {
 
         <FormField
           control={form.control}
-          name="takeProfit"
+          name="takeProfitPrice"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Take Profit</FormLabel>
+              <FormLabel>Take Profit Price (Optional)</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -148,10 +141,10 @@ export function PlaceOrderForm() {
 
         <FormField
           control={form.control}
-          name="stopLoss"
+          name="stopLossPrice"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Stop Loss</FormLabel>
+              <FormLabel>Stop Loss Price (Optional)</FormLabel>
               <FormControl>
                 <Input
                   type="number"
