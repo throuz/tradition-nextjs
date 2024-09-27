@@ -1,5 +1,3 @@
-"use client";
-
 import { Check, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 
@@ -19,9 +17,9 @@ import {
 import { KlineInterval } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-import { useKlineStore } from "../_providers/kline-store-providers";
+import { useKlineStore } from "../../_providers/kline-store-providers";
 
-export function KlineIntervalSelection() {
+export function KlineIntervalCombobox() {
   const intervals = Object.values(KlineInterval);
   const { interval, setInterval } = useKlineStore((state) => state);
   const [open, setOpen] = React.useState(false);

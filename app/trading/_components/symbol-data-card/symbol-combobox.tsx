@@ -17,10 +17,10 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-import { useSymbols } from "../_hooks/useSymbols";
-import { useKlineStore } from "../_providers/kline-store-providers";
+import { useSymbols } from "../../_hooks/useSymbols";
+import { useKlineStore } from "../../_providers/kline-store-providers";
 
-export function SymbolSelection() {
+export function SymbolCombobox() {
   const symbols = useSymbols();
   const { symbol, setSymbol } = useKlineStore((state) => state);
   const [open, setOpen] = React.useState(false);

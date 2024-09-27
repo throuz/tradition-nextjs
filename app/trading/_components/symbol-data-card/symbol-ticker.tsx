@@ -1,12 +1,10 @@
-"use client";
-
 import { useMemo } from "react";
 
-import { useTickerStream } from "../../../lib/streams/useTickerStream";
-import { useKlineStore } from "../_providers/kline-store-providers";
-import { SymbolSelection } from "./symbol-selection";
+import { useTickerStream } from "../../../../lib/streams/useTickerStream";
+import { useKlineStore } from "../../_providers/kline-store-providers";
+import { SymbolCombobox } from "./symbol-combobox";
 
-export default function SymbolTicker() {
+export function SymbolTicker() {
   const { symbol } = useKlineStore((state) => state);
   const tickerStream = useTickerStream(symbol);
 
@@ -21,7 +19,7 @@ export default function SymbolTicker() {
 
   return (
     <div className="flex items-center gap-4">
-      <SymbolSelection />
+      <SymbolCombobox />
       <div className="text-2xl font-bold">${lastPrice}</div>
       <div className="text-muted-foreground">24h Change: {priceChange}%</div>
     </div>

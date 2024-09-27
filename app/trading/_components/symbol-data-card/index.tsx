@@ -4,11 +4,11 @@ import React from "react";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { KlineIntervalSelection } from "./kline-interval-selection";
-import ChartComponent from "./market-overview-chart";
-import SymbolTicker from "./symbol-ticker";
+import { KlineChart } from "./kline-chart";
+import { KlineIntervalCombobox } from "./kline-interval-combobox";
+import { SymbolTicker } from "./symbol-ticker";
 
-export default function SymbolDataDisplay() {
+export default function SymbolDataCard() {
   return (
     <Card>
       <CardHeader>
@@ -16,9 +16,9 @@ export default function SymbolDataDisplay() {
       </CardHeader>
       <CardContent>
         <div className="mb-2">
-          <KlineIntervalSelection />
+          <KlineIntervalCombobox />
         </div>
-        <ChartComponent />
+        <KlineChart />
       </CardContent>
     </Card>
   );
