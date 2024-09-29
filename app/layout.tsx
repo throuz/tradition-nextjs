@@ -3,6 +3,8 @@ import "./globals.css";
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
 
+import { Toaster } from "@/components/ui/sonner";
+
 import Header from "./_components/_header/header";
 import Footer from "./_components/footer";
 import Providers from "./providers";
@@ -27,6 +29,18 @@ export default function RootLayout({
           <main>{children}</main>
           <Footer />
         </Providers>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            classNames: {
+              success: "text-green-400",
+              error: "text-red-400",
+              info: "text-blue-400",
+              warning: "text-yellow-400",
+              loading: "text-gray-400",
+            },
+          }}
+        />
       </body>
     </html>
   );

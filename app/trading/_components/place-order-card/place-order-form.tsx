@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { fetchTickerPrice } from "@/app/api/ticker/hooks";
@@ -127,7 +128,7 @@ export function PlaceOrderForm() {
 
       return !takeProfitError && !stopLossError;
     } catch (error) {
-      console.error("Error fetching ticker price information:", error);
+      form.setError("root", { message: "unknown error." });
       return false;
     }
   };
@@ -136,7 +137,7 @@ export function PlaceOrderForm() {
     const isValid = await validateValues(values);
 
     if (isValid) {
-      console.log("Order placed:", values);
+      toast.success(`Order placed: ${JSON.stringify(values)}`);
     }
   };
 
@@ -273,6 +274,12 @@ export function PlaceOrderForm() {
             </FormItem>
           )}
         />
+
+        {form.formState.errors.root && (
+          <div className="text-red-500 mb-4">
+            {form.formState.errors.root.message}
+          </div>
+        )}
 
         <Button type="submit">Place Order</Button>
       </form>

@@ -19,7 +19,6 @@ export async function GET(request: Request) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error fetching ticker price:", error);
     return NextResponse.json(
       { error: "Failed to fetch ticker price information" },
       { status: 500 }
