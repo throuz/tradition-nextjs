@@ -156,17 +156,13 @@ export function PlaceOrderForm() {
         <FormField
           control={form.control}
           name="orderSide"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>Order Side</FormLabel>
               <FormControl>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
-                    className={
-                      form.formState.errors.orderSide
-                        ? "border-destructive"
-                        : ""
-                    }
+                    className={fieldState.invalid ? "border-destructive" : ""}
                   >
                     <SelectValue placeholder="Select side" />
                   </SelectTrigger>
@@ -184,7 +180,7 @@ export function PlaceOrderForm() {
         <FormField
           control={form.control}
           name="leverage"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>Leverage</FormLabel>
               <FormControl>
@@ -199,9 +195,7 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
-                  className={
-                    form.formState.errors.leverage ? "border-destructive" : ""
-                  }
+                  className={fieldState.invalid ? "border-destructive" : ""}
                 />
               </FormControl>
               <FormMessage />
@@ -212,7 +206,7 @@ export function PlaceOrderForm() {
         <FormField
           control={form.control}
           name="amount"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>Amount</FormLabel>
               <FormControl>
@@ -227,9 +221,7 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
-                  className={
-                    form.formState.errors.amount ? "border-destructive" : ""
-                  }
+                  className={fieldState.invalid ? "border-destructive" : ""}
                 />
               </FormControl>
               <FormMessage />
@@ -240,7 +232,7 @@ export function PlaceOrderForm() {
         <FormField
           control={form.control}
           name="takeProfitPrice"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>Take Profit Price (Optional)</FormLabel>
               <FormControl>
@@ -255,11 +247,7 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
-                  className={
-                    form.formState.errors.takeProfitPrice
-                      ? "border-destructive"
-                      : ""
-                  }
+                  className={fieldState.invalid ? "border-destructive" : ""}
                 />
               </FormControl>
               <FormMessage />
@@ -270,7 +258,7 @@ export function PlaceOrderForm() {
         <FormField
           control={form.control}
           name="stopLossPrice"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>Stop Loss Price (Optional)</FormLabel>
               <FormControl>
@@ -285,11 +273,7 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
-                  className={
-                    form.formState.errors.stopLossPrice
-                      ? "border-destructive"
-                      : ""
-                  }
+                  className={fieldState.invalid ? "border-destructive" : ""}
                 />
               </FormControl>
               <FormMessage />
