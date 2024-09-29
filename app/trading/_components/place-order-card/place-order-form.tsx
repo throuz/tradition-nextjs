@@ -3,6 +3,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { fetchTickerPrice } from "@/app/api/ticker/hooks";
+import { TickerPriceResponse } from "@/app/api/ticker/types";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,41 +24,113 @@ import {
 } from "@/components/ui/select";
 import { OrderSide } from "@/lib/types";
 
-const formSchema = z.object({
-  leverage: z.coerce
-    .number()
-    .int({ message: "Leverage must be an integer." })
-    .min(1, { message: "Leverage must be at least 1." })
-    .max(100, { message: "Leverage cannot exceed 100." }),
-  amount: z.coerce
-    .number()
-    .min(0.01, { message: "Amount must be at least 0.01." })
-    .refine((value) => Number(value.toFixed(2)) === value, {
-      message: "Amount can have at most 2 decimal places.",
-    }),
-  takeProfitPrice: z.coerce.number().optional(),
-  stopLossPrice: z.coerce.number().optional(),
-  orderSide: z.nativeEnum(OrderSide, {
-    errorMap: () => ({ message: "Invalid order side" }),
-  }),
-});
+import { usePriceDecimalDigits } from "../../_hooks/usePriceDecimalDigits";
+import { useKlineStore } from "../../_providers/kline-store-providers";
 
 export function PlaceOrderForm() {
   const availableBalance = 1000; // Example balance; replace with actual balance from context/store
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      leverage: "" as unknown as number,
-      amount: "" as unknown as number,
-      takeProfitPrice: "" as unknown as number,
-      stopLossPrice: "" as unknown as number,
-      orderSide: OrderSide.Buy,
-    },
+  const { symbol } = useKlineStore((state) => state);
+  const priceDecimalDigits = usePriceDecimalDigits();
+
+  const formSchema = z.object({
+    orderSide: z.nativeEnum(OrderSide, {
+      errorMap: () => ({ message: "Invalid order side" }),
+    }),
+    leverage: z
+      .number()
+      .int({ message: "Leverage must be an integer." })
+      .min(1, { message: "Leverage must be at least 1." })
+      .max(200, { message: "Leverage cannot exceed 200." }),
+    amount: z
+      .number()
+      .min(0.01, { message: "Amount must be at least 0.01." })
+      .max(availableBalance, {
+        message: `Amount cannot exceed ${availableBalance}.`,
+      })
+      .refine((value) => Number(value.toFixed(2)) === value, {
+        message: "Amount can have at most 2 decimal places.",
+      }),
+    takeProfitPrice: z
+      .number()
+      .positive()
+      .refine((value) => Number(value.toFixed(priceDecimalDigits)) === value, {
+        message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places.`,
+      })
+      .optional(),
+    stopLossPrice: z
+      .number()
+      .positive()
+      .refine((value) => Number(value.toFixed(priceDecimalDigits)) === value, {
+        message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places.`,
+      })
+      .optional(),
   });
 
-  const handleOrderPlacement = (values: z.infer<typeof formSchema>) => {
-    console.log("Order placed:", values);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+
+  const validateTPSL = async (
+    values: z.infer<typeof formSchema>
+  ): Promise<boolean> => {
+    try {
+      const tickerPriceData = (await fetchTickerPrice(
+        symbol
+      )) as TickerPriceResponse;
+      const latestPrice = Number(tickerPriceData.price);
+
+      const { orderSide, takeProfitPrice, stopLossPrice } = values;
+
+      if (orderSide === OrderSide.Buy) {
+        const isTakeProfitPriceValid =
+          takeProfitPrice === undefined || takeProfitPrice > latestPrice;
+        const isStopLossPriceValid =
+          stopLossPrice === undefined || stopLossPrice < latestPrice;
+        if (!isTakeProfitPriceValid) {
+          form.setError("takeProfitPrice", {
+            message: `Take Profit Price must be greater than ${latestPrice}.`,
+          });
+        }
+        if (!isStopLossPriceValid) {
+          form.setError("stopLossPrice", {
+            message: `Stop Loss Price must be less than ${latestPrice}.`,
+          });
+        }
+        return isTakeProfitPriceValid && isStopLossPriceValid;
+      }
+
+      if (orderSide === OrderSide.Sell) {
+        const isTakeProfitPriceValid =
+          takeProfitPrice === undefined || takeProfitPrice < latestPrice;
+        const isStopLossPriceValid =
+          stopLossPrice === undefined || stopLossPrice > latestPrice;
+        if (!isTakeProfitPriceValid) {
+          form.setError("takeProfitPrice", {
+            message: `Take Profit Price must be less than ${latestPrice}.`,
+          });
+        }
+        if (!isStopLossPriceValid) {
+          form.setError("stopLossPrice", {
+            message: `Stop Loss Price must be greater than ${latestPrice}.`,
+          });
+        }
+        return isTakeProfitPriceValid && isStopLossPriceValid;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error fetching ticker price information:", error);
+      return false;
+    }
+  };
+
+  const handleOrderPlacement = async (values: z.infer<typeof formSchema>) => {
+    const isTPSLValid = await validateTPSL(values);
+
+    if (isTPSLValid) {
+      console.log("Order placed:", values);
+    }
   };
 
   return (
@@ -100,7 +174,18 @@ export function PlaceOrderForm() {
             <FormItem>
               <FormLabel>Leverage</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Enter leverage" {...field} />
+                <Input
+                  type="number"
+                  placeholder="Enter leverage"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    field.onChange(
+                      value === "" ? undefined : Number(event.target.value)
+                    );
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -114,7 +199,18 @@ export function PlaceOrderForm() {
             <FormItem>
               <FormLabel>Amount</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Enter amount" {...field} />
+                <Input
+                  type="number"
+                  placeholder="Enter amount"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    field.onChange(
+                      value === "" ? undefined : Number(event.target.value)
+                    );
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -132,6 +228,13 @@ export function PlaceOrderForm() {
                   type="number"
                   placeholder="Set take profit price"
                   {...field}
+                  value={field.value ?? ""}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    field.onChange(
+                      value === "" ? undefined : Number(event.target.value)
+                    );
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -150,6 +253,13 @@ export function PlaceOrderForm() {
                   type="number"
                   placeholder="Set stop loss price"
                   {...field}
+                  value={field.value ?? ""}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    field.onChange(
+                      value === "" ? undefined : Number(event.target.value)
+                    );
+                  }}
                 />
               </FormControl>
               <FormMessage />

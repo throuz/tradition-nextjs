@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { KlinesRequestParams, KlinesResponse } from "@/app/api/klines/types";
 
-const fetchKlinesData = async (
+export const fetchKlinesData = async (
   params: KlinesRequestParams
 ): Promise<KlinesResponse> => {
   const url = new URL("/api/klines", window.location.origin);
