@@ -161,7 +161,13 @@ export function PlaceOrderForm() {
               <FormLabel>Order Side</FormLabel>
               <FormControl>
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    className={
+                      form.formState.errors.orderSide
+                        ? "border-destructive"
+                        : ""
+                    }
+                  >
                     <SelectValue placeholder="Select side" />
                   </SelectTrigger>
                   <SelectContent>
@@ -193,6 +199,9 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
+                  className={
+                    form.formState.errors.leverage ? "border-destructive" : ""
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -218,6 +227,9 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
+                  className={
+                    form.formState.errors.amount ? "border-destructive" : ""
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -243,6 +255,11 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
+                  className={
+                    form.formState.errors.takeProfitPrice
+                      ? "border-destructive"
+                      : ""
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -268,6 +285,11 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
+                  className={
+                    form.formState.errors.stopLossPrice
+                      ? "border-destructive"
+                      : ""
+                  }
                 />
               </FormControl>
               <FormMessage />
