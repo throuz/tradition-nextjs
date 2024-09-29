@@ -27,6 +27,35 @@ import { OrderSide } from "@/lib/types";
 import { usePriceDecimalDigits } from "../../_hooks/usePriceDecimalDigits";
 import { useKlineStore } from "../../_providers/kline-store-providers";
 
+const validateTPSL = (
+  orderSide: OrderSide,
+  latestPrice: number,
+  takeProfitPrice?: number,
+  stopLossPrice?: number
+): { takeProfitPrice?: string; stopLossPrice?: string } => {
+  const errors: { takeProfitPrice?: string; stopLossPrice?: string } = {};
+
+  if (orderSide === OrderSide.Buy) {
+    if (takeProfitPrice !== undefined && takeProfitPrice <= latestPrice) {
+      errors.takeProfitPrice = `Take Profit Price must be greater than ${latestPrice}.`;
+    }
+    if (stopLossPrice !== undefined && stopLossPrice >= latestPrice) {
+      errors.stopLossPrice = `Stop Loss Price must be less than ${latestPrice}.`;
+    }
+  }
+
+  if (orderSide === OrderSide.Sell) {
+    if (takeProfitPrice !== undefined && takeProfitPrice >= latestPrice) {
+      errors.takeProfitPrice = `Take Profit Price must be less than ${latestPrice}.`;
+    }
+    if (stopLossPrice !== undefined && stopLossPrice <= latestPrice) {
+      errors.stopLossPrice = `Stop Loss Price must be greater than ${latestPrice}.`;
+    }
+  }
+
+  return errors;
+};
+
 export function PlaceOrderForm() {
   const availableBalance = 1000; // Example balance; replace with actual balance from context/store
 
@@ -71,54 +100,32 @@ export function PlaceOrderForm() {
     resolver: zodResolver(formSchema),
   });
 
-  const validateTPSL = async (
+  const validateValues = async (
     values: z.infer<typeof formSchema>
   ): Promise<boolean> => {
     try {
-      const tickerPriceData = (await fetchTickerPrice(
+      const { price: latestPrice } = (await fetchTickerPrice(
         symbol
       )) as TickerPriceResponse;
-      const latestPrice = Number(tickerPriceData.price);
 
       const { orderSide, takeProfitPrice, stopLossPrice } = values;
 
-      if (orderSide === OrderSide.Buy) {
-        const isTakeProfitPriceValid =
-          takeProfitPrice === undefined || takeProfitPrice > latestPrice;
-        const isStopLossPriceValid =
-          stopLossPrice === undefined || stopLossPrice < latestPrice;
-        if (!isTakeProfitPriceValid) {
-          form.setError("takeProfitPrice", {
-            message: `Take Profit Price must be greater than ${latestPrice}.`,
-          });
-        }
-        if (!isStopLossPriceValid) {
-          form.setError("stopLossPrice", {
-            message: `Stop Loss Price must be less than ${latestPrice}.`,
-          });
-        }
-        return isTakeProfitPriceValid && isStopLossPriceValid;
+      const { takeProfitPrice: takeProfitError, stopLossPrice: stopLossError } =
+        validateTPSL(
+          orderSide,
+          Number(latestPrice),
+          takeProfitPrice,
+          stopLossPrice
+        );
+
+      if (takeProfitError) {
+        form.setError("takeProfitPrice", { message: takeProfitError });
+      }
+      if (stopLossError) {
+        form.setError("stopLossPrice", { message: stopLossError });
       }
 
-      if (orderSide === OrderSide.Sell) {
-        const isTakeProfitPriceValid =
-          takeProfitPrice === undefined || takeProfitPrice < latestPrice;
-        const isStopLossPriceValid =
-          stopLossPrice === undefined || stopLossPrice > latestPrice;
-        if (!isTakeProfitPriceValid) {
-          form.setError("takeProfitPrice", {
-            message: `Take Profit Price must be less than ${latestPrice}.`,
-          });
-        }
-        if (!isStopLossPriceValid) {
-          form.setError("stopLossPrice", {
-            message: `Stop Loss Price must be greater than ${latestPrice}.`,
-          });
-        }
-        return isTakeProfitPriceValid && isStopLossPriceValid;
-      }
-
-      return true;
+      return !takeProfitError && !stopLossError;
     } catch (error) {
       console.error("Error fetching ticker price information:", error);
       return false;
@@ -126,9 +133,9 @@ export function PlaceOrderForm() {
   };
 
   const handleOrderPlacement = async (values: z.infer<typeof formSchema>) => {
-    const isTPSLValid = await validateTPSL(values);
+    const isValid = await validateValues(values);
 
-    if (isTPSLValid) {
+    if (isValid) {
       console.log("Order placed:", values);
     }
   };
