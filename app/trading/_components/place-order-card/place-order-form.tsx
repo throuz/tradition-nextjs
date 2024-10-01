@@ -158,11 +158,13 @@ export function PlaceOrderForm() {
           name="orderSide"
           render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Order Side</FormLabel>
+              <FormLabel className={fieldState.invalid ? "text-error" : ""}>
+                Order Side
+              </FormLabel>
               <FormControl>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
-                    className={fieldState.invalid ? "border-destructive" : ""}
+                    className={fieldState.invalid ? "border-error" : ""}
                   >
                     {field.value ? (
                       <SelectValue />
@@ -176,7 +178,7 @@ export function PlaceOrderForm() {
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage />
+              <FormMessage className={fieldState.invalid ? "text-error" : ""} />
             </FormItem>
           )}
         />
@@ -186,7 +188,9 @@ export function PlaceOrderForm() {
           name="leverage"
           render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Leverage</FormLabel>
+              <FormLabel className={fieldState.invalid ? "text-error" : ""}>
+                Leverage
+              </FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -199,10 +203,10 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
-                  className={fieldState.invalid ? "border-destructive" : ""}
+                  className={fieldState.invalid ? "border-error" : ""}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className={fieldState.invalid ? "text-error" : ""} />
             </FormItem>
           )}
         />
@@ -212,7 +216,9 @@ export function PlaceOrderForm() {
           name="amount"
           render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel className={fieldState.invalid ? "text-error" : ""}>
+                Amount
+              </FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -225,10 +231,10 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
-                  className={fieldState.invalid ? "border-destructive" : ""}
+                  className={fieldState.invalid ? "border-error" : ""}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className={fieldState.invalid ? "text-error" : ""} />
             </FormItem>
           )}
         />
@@ -238,7 +244,9 @@ export function PlaceOrderForm() {
           name="takeProfitPrice"
           render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Take Profit Price (Optional)</FormLabel>
+              <FormLabel className={fieldState.invalid ? "text-error" : ""}>
+                Take Profit Price (Optional)
+              </FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -251,10 +259,10 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
-                  className={fieldState.invalid ? "border-destructive" : ""}
+                  className={fieldState.invalid ? "border-error" : ""}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className={fieldState.invalid ? "text-error" : ""} />
             </FormItem>
           )}
         />
@@ -264,7 +272,9 @@ export function PlaceOrderForm() {
           name="stopLossPrice"
           render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Stop Loss Price (Optional)</FormLabel>
+              <FormLabel className={fieldState.invalid ? "text-error" : ""}>
+                Stop Loss Price (Optional)
+              </FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -277,10 +287,10 @@ export function PlaceOrderForm() {
                       value === "" ? undefined : Number(event.target.value)
                     );
                   }}
-                  className={fieldState.invalid ? "border-destructive" : ""}
+                  className={fieldState.invalid ? "border-error" : ""}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className={fieldState.invalid ? "text-error" : ""} />
             </FormItem>
           )}
         />
