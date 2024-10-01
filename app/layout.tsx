@@ -33,11 +33,11 @@ export default function RootLayout({
           position="top-right"
           toastOptions={{
             classNames: {
-              success: "text-green-400",
-              error: "text-red-400",
-              info: "text-blue-400",
-              warning: "text-yellow-400",
-              loading: "text-gray-400",
+              success: "text-success",
+              error: "text-error",
+              info: "text-info",
+              warning: "text-warning",
+              loading: "text-loading",
             },
           }}
         />
