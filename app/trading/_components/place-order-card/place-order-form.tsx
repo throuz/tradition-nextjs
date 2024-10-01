@@ -69,30 +69,30 @@ export function PlaceOrderForm() {
     }),
     leverage: z
       .number()
-      .int({ message: "Leverage must be an integer." })
-      .min(1, { message: "Leverage must be at least 1." })
-      .max(200, { message: "Leverage cannot exceed 200." }),
+      .int({ message: "Leverage must be an integer" })
+      .min(1, { message: "Leverage must be at least 1" })
+      .max(200, { message: "Leverage cannot exceed 200" }),
     amount: z
       .number()
-      .min(0.01, { message: "Amount must be at least 0.01." })
+      .min(0.01, { message: "Amount must be at least 0.01" })
       .max(availableBalance, {
-        message: `Amount cannot exceed ${availableBalance}.`,
+        message: `Amount cannot exceed ${availableBalance}`,
       })
       .refine((value) => Number(value.toFixed(2)) === value, {
-        message: "Amount can have at most 2 decimal places.",
+        message: "Amount can have at most 2 decimal places",
       }),
     takeProfitPrice: z
       .number()
       .positive()
       .refine((value) => Number(value.toFixed(priceDecimalDigits)) === value, {
-        message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places.`,
+        message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places`,
       })
       .optional(),
     stopLossPrice: z
       .number()
       .positive()
       .refine((value) => Number(value.toFixed(priceDecimalDigits)) === value, {
-        message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places.`,
+        message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places`,
       })
       .optional(),
   });
@@ -128,7 +128,7 @@ export function PlaceOrderForm() {
 
       return !takeProfitError && !stopLossError;
     } catch (error) {
-      form.setError("root", { message: "unknown error." });
+      form.setError("root", { message: "Unknown error" });
       return false;
     }
   };
@@ -164,7 +164,11 @@ export function PlaceOrderForm() {
                   <SelectTrigger
                     className={fieldState.invalid ? "border-destructive" : ""}
                   >
-                    <SelectValue placeholder="Select side" />
+                    {field.value ? (
+                      <SelectValue />
+                    ) : (
+                      <span className="text-muted-foreground">Select side</span>
+                    )}
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={OrderSide.Buy}>Buy</SelectItem>
