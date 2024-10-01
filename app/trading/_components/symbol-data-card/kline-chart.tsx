@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   BarData,
   createChart,
@@ -9,7 +10,6 @@ import {
   TimeChartOptions,
 } from "lightweight-charts";
 import { RefreshCcw } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 

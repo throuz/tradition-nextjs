@@ -1,5 +1,5 @@
-import { CandlestickData, Time } from "lightweight-charts";
 import { useMemo } from "react";
+import { CandlestickData, Time } from "lightweight-charts";
 
 import { useKlinesQuery } from "@/app/api/klines/hooks";
 

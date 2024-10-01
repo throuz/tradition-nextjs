@@ -2,7 +2,23 @@
   "extends": "next/core-web-vitals",
   "plugins": ["simple-import-sort"],
   "rules": {
-    "simple-import-sort/imports": "error",
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          // External libraries like react, etc.
+          ["^react", "^@?\\w"],
+          // Internal aliases (e.g., "@/app/..", "@/components/..")
+          ["^@/"],
+          // Parent imports starting with "../"
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+          // Sibling imports starting with "./"
+          ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+          // Side effect imports
+          ["^\\u0000"]
+        ]
+      }
+    ],
     "simple-import-sort/exports": "error"
   }
 }

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import { useTickerStream } from "../../../../lib/streams/useTickerStream";
 import { useKlineStore } from "../../_providers/kline-store-providers";
+
 import { SymbolCombobox } from "./symbol-combobox";
 
 export function SymbolTicker() {

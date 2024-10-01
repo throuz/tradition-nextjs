@@ -1,5 +1,5 @@
-import { DeepPartial, PriceFormat } from "lightweight-charts";
 import { useMemo } from "react";
+import { DeepPartial, PriceFormat } from "lightweight-charts";
 
 import { useExchangeInfoQuery } from "@/app/api/exchange-info/hooks";
 import { FilterType } from "@/lib/types";
