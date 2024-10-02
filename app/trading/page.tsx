@@ -1,8 +1,8 @@
 import React from "react";
 
 import PlaceOrderCard from "./_components/place-order-card";
+import PositionsCard from "./_components/positions-card";
 import SymbolDataCard from "./_components/symbol-data-card";
-import UserPortfolio from "./_components/user-portfolio";
 
 export default function Trading() {
   return (
@@ -14,7 +14,7 @@ export default function Trading() {
         <PlaceOrderCard />
       </div>
       <div className="col-span-4">
-        <UserPortfolio />
+        <PositionsCard />
       </div>
     </div>
   );
