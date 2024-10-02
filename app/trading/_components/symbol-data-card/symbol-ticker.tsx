@@ -19,7 +19,7 @@ export function SymbolTicker() {
   }, [tickerStream?.P]);
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col lg:flex-row items-center gap-4">
       <SymbolCombobox />
       <div className="text-2xl font-bold">${lastPrice}</div>
       <div className="text-muted-foreground">24h Change: {priceChange}%</div>
