@@ -69,7 +69,7 @@ export function KlineChart() {
     chart.timeScale().applyOptions({
       borderColor: "#71649C",
       barSpacing: 10,
-      rightOffset: 20,
+      rightOffset: 5,
       timeVisible: true,
     });
 
