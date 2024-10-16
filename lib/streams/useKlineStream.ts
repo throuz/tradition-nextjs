@@ -27,10 +27,17 @@ export interface KlineStream {
   };
 }
 
-const useKlineStream = (symbol: string, interval: KlineInterval) => {
+const useKlineStream = (
+  symbol: string | null,
+  interval: KlineInterval | null
+) => {
   const [data, setData] = useState<KlineStream | null>(null);
 
   useEffect(() => {
+    if (!symbol || !interval) {
+      return;
+    }
+
     const socket = new WebSocket(
       `wss://fstream.binance.com/ws/${symbol.toLowerCase()}@kline_${interval}`
     );

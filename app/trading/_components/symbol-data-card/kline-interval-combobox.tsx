@@ -1,5 +1,8 @@
+"use client";
+
 import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,12 +20,24 @@ import {
 import { KlineInterval } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-import { useKlineStore } from "../../_providers/kline-store-providers";
-
 export function KlineIntervalCombobox() {
   const intervals = Object.values(KlineInterval);
-  const { interval, setInterval } = useKlineStore((state) => state);
   const [open, setOpen] = React.useState(false);
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const createQueryString = React.useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+      return params.toString();
+    },
+    [searchParams]
+  );
+
+  const interval = searchParams.get("interval");
 
   return (
     <div className="flex gap-2 items-center">
@@ -48,8 +63,10 @@ export function KlineIntervalCombobox() {
                   <CommandItem
                     key={klineInterval}
                     value={klineInterval}
-                    onSelect={() => {
-                      setInterval(klineInterval);
+                    onSelect={(value) => {
+                      router.push(
+                        pathname + "?" + createQueryString("interval", value)
+                      );
                       setOpen(false);
                     }}
                   >

@@ -21,10 +21,14 @@ export interface TickerStream {
   n: number; // Total number of trades
 }
 
-export const useTickerStream = (symbol: string) => {
+export const useTickerStream = (symbol: string | null) => {
   const [data, setData] = useState<TickerStream | null>(null);
 
   useEffect(() => {
+    if (!symbol) {
+      return;
+    }
+
     const socket = new WebSocket(
       `wss://fstream.binance.com/ws/${symbol.toLowerCase()}@ticker`
     );

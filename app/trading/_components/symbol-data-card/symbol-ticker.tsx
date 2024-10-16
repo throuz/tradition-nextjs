@@ -1,12 +1,16 @@
+"use client";
+
 import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { useTickerStream } from "../../../../lib/streams/useTickerStream";
-import { useKlineStore } from "../../_providers/kline-store-providers";
 
 import { SymbolCombobox } from "./symbol-combobox";
 
 export function SymbolTicker() {
-  const { symbol } = useKlineStore((state) => state);
+  const searchParams = useSearchParams();
+  const symbol = searchParams.get("symbol");
+
   const tickerStream = useTickerStream(symbol);
 
   const lastPrice = tickerStream?.c ?? "-";

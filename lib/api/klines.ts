@@ -22,3 +22,20 @@ export type KlinesResponse = [
   string, // Taker buy quote asset volume
   string // Ignore (unused field)
 ][];
+
+export const fetchKlines = async (
+  params: KlinesRequestParams
+): Promise<KlinesResponse> => {
+  const url = new URL("https://fapi.binance.com/fapi/v1/klines");
+  Object.keys(params).forEach((key) => {
+    if (params[key as keyof KlinesRequestParams] !== undefined) {
+      url.searchParams.append(
+        key,
+        String(params[key as keyof KlinesRequestParams])
+      );
+    }
+  });
+  const response = await fetch(url.toString());
+  if (!response.ok) throw new Error("Failed to fetch klines data");
+  return response.json();
+};

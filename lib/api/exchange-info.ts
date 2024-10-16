@@ -56,3 +56,9 @@ export interface ExchangeInfoResponse {
   symbols: SymbolInfo[];
   timezone: string;
 }
+
+export const fetchExchangeInfo = async (): Promise<ExchangeInfoResponse> => {
+  const response = await fetch("https://fapi.binance.com/fapi/v1/exchangeInfo");
+  if (!response.ok) throw new Error("Failed to fetch exchange information");
+  return response.json();
+};

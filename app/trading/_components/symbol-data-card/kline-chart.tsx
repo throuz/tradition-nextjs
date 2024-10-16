@@ -1,22 +1,64 @@
-import { useEffect, useRef } from "react";
+"use client";
+
+import { useEffect, useMemo, useRef } from "react";
 import {
   BarData,
+  CandlestickData,
   createChart,
   CrosshairMode,
   DeepPartial,
   ISeriesApi,
   LineStyle,
+  PriceFormat,
   Time,
   TimeChartOptions,
 } from "lightweight-charts";
 import { RefreshCcw } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { FilterType, KlineInterval } from "@/lib/types";
 
 import useKlineStream from "../../../../lib/streams/useKlineStream";
-import { useCandlestickDatas } from "../../_hooks/useCandlestickDatas";
-import { useChartPriceFormat } from "../../_hooks/useChartPriceFormat";
-import { useKlineStore } from "../../_providers/kline-store-providers";
+import { useSymbolDataCardContext } from "../../_contexts/symbol-data-card-context";
+
+function useChartPriceFormat(): DeepPartial<PriceFormat> {
+  const searchParams = useSearchParams();
+  const symbol = searchParams.get("symbol");
+  const { exchangeInfoResponse } = useSymbolDataCardContext();
+
+  const chartPriceFormat = useMemo<DeepPartial<PriceFormat>>(() => {
+    const foundSymbolInfo = exchangeInfoResponse.symbols.find(
+      (symbolInfo) => symbolInfo.symbol === symbol
+    );
+
+    const minMove = Number(
+      foundSymbolInfo?.filters.find(
+        (item) => item.filterType === FilterType.PriceFilter
+      )?.tickSize
+    );
+
+    return { type: "price", minMove };
+  }, [exchangeInfoResponse.symbols, symbol]);
+
+  return chartPriceFormat;
+}
+
+function useCandlestickDatas(): CandlestickData[] {
+  const { klinesResponse } = useSymbolDataCardContext();
+
+  const candlestickDatas = useMemo<CandlestickData[]>(() => {
+    return klinesResponse.map((kline) => ({
+      time: (kline[6] / 1000) as Time,
+      open: Number(kline[1]),
+      high: Number(kline[2]),
+      low: Number(kline[3]),
+      close: Number(kline[4]),
+    }));
+  }, [klinesResponse]);
+
+  return candlestickDatas;
+}
 
 export function KlineChart() {
   const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -24,11 +66,14 @@ export function KlineChart() {
   const candlestickSeriesRef = useRef<ISeriesApi<"Candlestick", Time> | null>(
     null
   );
-  const chartPriceFormat = useChartPriceFormat();
 
+  const chartPriceFormat = useChartPriceFormat();
   const candlestickDatas = useCandlestickDatas();
-  const { symbol, interval } = useKlineStore((state) => state);
-  const klineStream = useKlineStream(symbol, interval);
+
+  const searchParams = useSearchParams();
+  const symbol = searchParams.get("symbol");
+  const interval = searchParams.get("interval");
+  const klineStream = useKlineStream(symbol, interval as KlineInterval | null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;

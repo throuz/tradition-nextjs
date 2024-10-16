@@ -1,11 +1,12 @@
+"use client";
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { fetchTickerPrice } from "@/app/api/ticker/hooks";
-import { TickerPriceResponse } from "@/app/api/ticker/types";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,10 +24,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { OrderSide } from "@/lib/types";
+import { fetchTicker, TickerResponse } from "@/lib/api/ticker";
+import { FilterType, OrderSide } from "@/lib/types";
 
-import { usePriceDecimalDigits } from "../../_hooks/usePriceDecimalDigits";
-import { useKlineStore } from "../../_providers/kline-store-providers";
+import { usePlaceOrderCardContext } from "../../_contexts/place-order-card-context";
+
+function usePriceDecimalDigits() {
+  const searchParams = useSearchParams();
+  const symbol = searchParams.get("symbol");
+  const { exchangeInfoResponse } = usePlaceOrderCardContext();
+
+  const foundSymbolInfo = exchangeInfoResponse.symbols.find(
+    (symbolInfo) => symbolInfo.symbol === symbol
+  );
+
+  const tickSize = foundSymbolInfo?.filters.find(
+    (item) => item.filterType === FilterType.PriceFilter
+  )?.tickSize;
+
+  function getDecimalDigits(value: string | undefined): number {
+    if (value && value.includes(".")) {
+      const decimalPart = value.split(".")[1];
+      return decimalPart.length;
+    }
+    return 0;
+  }
+
+  const digits = getDecimalDigits(tickSize);
+
+  return digits;
+}
 
 const validateTPSL = (
   orderSide: OrderSide,
@@ -60,7 +87,9 @@ const validateTPSL = (
 export function PlaceOrderForm() {
   const availableBalance = 1000; // Example balance; replace with actual balance from context/store
 
-  const { symbol } = useKlineStore((state) => state);
+  const searchParams = useSearchParams();
+  const symbol = searchParams.get("symbol");
+
   const priceDecimalDigits = usePriceDecimalDigits();
 
   const formSchema = z.object({
@@ -105,9 +134,9 @@ export function PlaceOrderForm() {
     values: z.infer<typeof formSchema>
   ): Promise<boolean> => {
     try {
-      const { price: latestPrice } = (await fetchTickerPrice(
-        symbol
-      )) as TickerPriceResponse;
+      const { price: latestPrice } = (await fetchTicker(
+        symbol ?? undefined
+      )) as TickerResponse;
 
       const { orderSide, takeProfitPrice, stopLossPrice } = values;
 
