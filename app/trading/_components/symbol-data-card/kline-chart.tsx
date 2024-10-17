@@ -49,7 +49,7 @@ function useCandlestickDatas(): CandlestickData[] {
 
   const candlestickDatas = useMemo<CandlestickData[]>(() => {
     return klinesResponse.map((kline) => ({
-      time: (kline[6] / 1000) as Time,
+      time: (kline[0] / 1000) as Time,
       open: Number(kline[1]),
       high: Number(kline[2]),
       low: Number(kline[3]),
@@ -101,6 +101,9 @@ export function KlineChart() {
           color: "#9B7DFF",
           labelBackgroundColor: "#9B7DFF",
         },
+      },
+      localization: {
+        dateFormat: "yyyy/MM/dd",
       },
     };
 
@@ -163,9 +166,9 @@ export function KlineChart() {
 
   useEffect(() => {
     if (klineStream && candlestickSeriesRef.current) {
-      const { T, o, h, l, c } = klineStream.k;
+      const { t, o, h, l, c } = klineStream.k;
       const barData: BarData = {
-        time: (T / 1000) as Time,
+        time: (t / 1000) as Time,
         open: Number(o),
         high: Number(h),
         low: Number(l),
