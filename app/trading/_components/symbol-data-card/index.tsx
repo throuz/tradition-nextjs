@@ -4,7 +4,11 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchExchangeInfo } from "@/lib/api/exchange-info";
 import { fetchKlines } from "@/lib/api/klines";
-import { fetchTicker24hr, Ticker24hrResponse } from "@/lib/api/ticker24hr";
+import {
+  fetchTicker24hr,
+  Ticker24hrAllSymbolsResponse,
+  Ticker24hrResponse,
+} from "@/lib/api/ticker24hr";
 import { KlineInterval } from "@/lib/types";
 
 import { SymbolDataCardProvider } from "../../_contexts/symbol-data-card-context";
@@ -20,18 +24,26 @@ async function SymbolDataCardContent({
   symbol: string;
   interval: KlineInterval;
 }) {
-  const [klinesResponse, exchangeInfoResponse, ticker24hrResponse] =
-    await Promise.all([
-      fetchKlines({ symbol, interval, limit: 1500 }),
-      fetchExchangeInfo(),
-      fetchTicker24hr(symbol),
-    ]);
+  const [
+    klinesResponse,
+    exchangeInfoResponse,
+    ticker24hrResponse,
+    ticker24hrAllSymbolsResponse,
+  ] = await Promise.all([
+    fetchKlines({ symbol, interval, limit: 1500 }),
+    fetchExchangeInfo(),
+    fetchTicker24hr(symbol),
+    fetchTicker24hr(),
+  ]);
 
   return (
     <SymbolDataCardProvider
       klinesResponse={klinesResponse}
       exchangeInfoResponse={exchangeInfoResponse}
       ticker24hrResponse={ticker24hrResponse as Ticker24hrResponse}
+      ticker24hrAllSymbolsResponse={
+        ticker24hrAllSymbolsResponse as Ticker24hrAllSymbolsResponse
+      }
     >
       <Card>
         <CardHeader>
