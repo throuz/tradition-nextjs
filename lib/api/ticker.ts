@@ -12,7 +12,7 @@ export const fetchTicker = async (
   const url = symbol
     ? `https://fapi.binance.com/fapi/ticker?symbol=${symbol}`
     : `https://fapi.binance.com/fapi/ticker`;
-  const response = await fetch(url);
+  const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) throw new Error("Failed to fetch ticker");
   return response.json();
 };

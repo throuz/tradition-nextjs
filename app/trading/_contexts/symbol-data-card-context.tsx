@@ -4,10 +4,12 @@ import React, { createContext, ReactNode, useContext } from "react";
 
 import { ExchangeInfoResponse } from "@/lib/api/exchange-info";
 import { KlinesResponse } from "@/lib/api/klines";
+import { Ticker24hrResponse } from "@/lib/api/ticker24hr";
 
 interface SymbolDataCardContextProps {
   klinesResponse: KlinesResponse;
   exchangeInfoResponse: ExchangeInfoResponse;
+  ticker24hrResponse: Ticker24hrResponse;
 }
 
 const SymbolDataCardContext = createContext<
@@ -17,15 +19,17 @@ const SymbolDataCardContext = createContext<
 export const SymbolDataCardProvider = ({
   klinesResponse,
   exchangeInfoResponse,
+  ticker24hrResponse,
   children,
 }: {
   klinesResponse: KlinesResponse;
   exchangeInfoResponse: ExchangeInfoResponse;
+  ticker24hrResponse: Ticker24hrResponse;
   children: ReactNode;
 }) => {
   return (
     <SymbolDataCardContext.Provider
-      value={{ klinesResponse, exchangeInfoResponse }}
+      value={{ klinesResponse, exchangeInfoResponse, ticker24hrResponse }}
     >
       {children}
     </SymbolDataCardContext.Provider>

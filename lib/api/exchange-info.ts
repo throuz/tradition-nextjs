@@ -58,7 +58,10 @@ export interface ExchangeInfoResponse {
 }
 
 export const fetchExchangeInfo = async (): Promise<ExchangeInfoResponse> => {
-  const response = await fetch("https://fapi.binance.com/fapi/v1/exchangeInfo");
+  const response = await fetch(
+    "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    { cache: "no-store" }
+  );
   if (!response.ok) throw new Error("Failed to fetch exchange information");
   return response.json();
 };

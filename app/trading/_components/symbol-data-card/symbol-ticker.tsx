@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { useTickerStream } from "../../../../lib/streams/useTickerStream";
+import { useSymbolDataCardContext } from "../../_contexts/symbol-data-card-context";
 
 import { SymbolCombobox } from "./symbol-combobox";
 
@@ -12,15 +13,15 @@ export function SymbolTicker() {
   const symbol = searchParams.get("symbol");
 
   const tickerStream = useTickerStream(symbol);
+  const { ticker24hrResponse } = useSymbolDataCardContext();
 
-  const lastPrice = tickerStream?.c ?? "-";
+  const lastPrice = tickerStream?.c || ticker24hrResponse.lastPrice;
 
   const priceChange = useMemo(() => {
-    const priceChange = tickerStream?.P;
-    if (!priceChange) return "-";
-    const changeValue = parseFloat(priceChange);
+    const priceChangeValue = tickerStream?.P || ticker24hrResponse.priceChange;
+    const changeValue = parseFloat(priceChangeValue);
     return `${changeValue >= 0 ? "+" : ""}${changeValue.toFixed(2)}`;
-  }, [tickerStream?.P]);
+  }, [tickerStream?.P, ticker24hrResponse.priceChange]);
 
   return (
     <div className="flex flex-col lg:flex-row items-center gap-4">
