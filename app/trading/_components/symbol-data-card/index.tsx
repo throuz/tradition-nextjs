@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchExchangeInfo } from "@/lib/api/exchange-info";
 import { fetchKlines } from "@/lib/api/klines";
-import { fetchTicker, TickerResponse } from "@/lib/api/ticker";
 import { fetchTicker24hr, Ticker24hrResponse } from "@/lib/api/ticker24hr";
 import { KlineInterval } from "@/lib/types";
 
@@ -23,7 +22,7 @@ async function SymbolDataCardContent({
 }) {
   const [klinesResponse, exchangeInfoResponse, ticker24hrResponse] =
     await Promise.all([
-      fetchKlines({ symbol, interval }),
+      fetchKlines({ symbol, interval, limit: 1500 }),
       fetchExchangeInfo(),
       fetchTicker24hr(symbol),
     ]);
