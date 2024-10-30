@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 
 import { Toaster } from "@/components/ui/sonner";
 
-import Header from "./_components/_header/header";
+import Header from "./_components/_header";
 import Footer from "./_components/footer";
 import Providers from "./providers";
 

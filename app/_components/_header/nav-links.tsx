@@ -13,7 +13,7 @@ const links: { name: string; href: string }[] = [
   { name: "Account", href: "/account" },
 ];
 
-export default function NavLinks() {
+export function NavLinks() {
   const pathname = usePathname();
 
   return (

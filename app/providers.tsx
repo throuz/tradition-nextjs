@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
+import { MetaMaskProvider, MetaMaskSDKOptions } from "@metamask/sdk-react";
 import {
   isServer,
   QueryClient,
@@ -31,17 +32,22 @@ function getQueryClient() {
 }
 
 export default function Providers({ children }: { children: ReactNode }) {
+  const sdkOptions: MetaMaskSDKOptions = {
+    dappMetadata: {},
+  };
   const queryClient = getQueryClient();
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        enableSystem
-        disableTransitionOnChange
-      >
-        {children}
-      </ThemeProvider>
-    </QueryClientProvider>
+    <MetaMaskProvider sdkOptions={sdkOptions}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </QueryClientProvider>
+    </MetaMaskProvider>
   );
 }
