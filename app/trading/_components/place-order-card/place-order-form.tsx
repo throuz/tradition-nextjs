@@ -28,6 +28,7 @@ import { fetchTicker, TickerResponse } from "@/lib/api/ticker";
 import { FilterType, OrderSide } from "@/lib/types";
 
 import { usePlaceOrderCardContext } from "./context";
+import { TradingModeButtons } from "./trading-mode-buttons";
 
 function usePriceDecimalDigits() {
   const searchParams = useSearchParams();
@@ -176,11 +177,12 @@ export function PlaceOrderForm() {
         onSubmit={form.handleSubmit(handleOrderPlacement)}
         className="space-y-4"
       >
-        <div className="mb-4">
-          <span className="block mb-1">
-            Available Balance: ${availableBalance.toFixed(2)}
-          </span>
-        </div>
+        <FormItem>
+          <FormLabel>Trading Mode</FormLabel>
+          <TradingModeButtons />
+        </FormItem>
+
+        <div>Available Balance: ${availableBalance.toFixed(2)}</div>
 
         <FormField
           control={form.control}
