@@ -15,15 +15,18 @@ export const useGlobalStore = create<GlobalStore>()(
   persist(
     (set, get) => ({
       positions: [],
-      openPosition: (position) =>
-        set({ positions: [...get().positions, position] }),
+      openPosition: (position) => {
+        const { positions } = get();
+        positions.push(position);
+        set({ positions });
+      },
       closePosition: (id) => {
-        const positions = get().positions;
+        const { positions } = get();
         const index = positions.findIndex((position) => position.id === id);
         if (index !== -1) {
           positions.splice(index, 1);
-          set({ positions });
         }
+        set({ positions });
       },
       tradingMode: TradingMode.Demo,
       setTradingMode: (tradingMode) => set({ tradingMode }),
