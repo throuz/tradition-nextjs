@@ -177,3 +177,17 @@ export type SymbolFilter =
   | MaxNumAlgoOrdersFilter
   | PercentPriceFilter
   | MinNotionalFilter;
+
+export enum TradingMode {
+  Real = "REAL",
+  Demo = "DEMO",
+}
+
+export interface Position {
+  fundingAmount: number;
+  symbol: string;
+  size: number;
+  entryPrice: number;
+  lastPrice: number;
+  liqPrice: number;
+}

@@ -1,32 +1,22 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export enum TradingMode {
-  Real = "REAL",
-  Demo = "DEMO",
-}
+import { Position, TradingMode } from "../types";
 
 export type GlobalStore = {
-  bears: number;
-  addABear: () => void;
-  userData: Record<string, any> | null;
-  setUserData: (data: Record<string, any>) => void;
+  positions: Position[];
+  setPositions: (positions: Position[]) => void;
   tradingMode: TradingMode;
-  setTradingMode: (mode: TradingMode) => void;
-  resetStore: () => void;
+  setTradingMode: (tradingMode: TradingMode) => void;
 };
 
 export const useGlobalStore = create<GlobalStore>()(
   persist(
-    (set, get) => ({
-      bears: 0,
-      addABear: () => set({ bears: get().bears + 1 }),
-      userData: null,
-      setUserData: (data) => set({ userData: data }),
+    (set) => ({
+      positions: [],
+      setPositions: (positions) => set({ positions }),
       tradingMode: TradingMode.Demo,
-      setTradingMode: (mode) => set({ tradingMode: mode }),
-      resetStore: () =>
-        set({ bears: 0, userData: null, tradingMode: TradingMode.Demo }),
+      setTradingMode: (tradingMode) => set({ tradingMode }),
     }),
     {
       name: "global-storage",

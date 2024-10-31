@@ -3,7 +3,8 @@
 import React from "react";
 
 import { Button } from "@/components/ui/button";
-import { TradingMode, useGlobalStore } from "@/lib/hooks/useGlobalStore";
+import { useGlobalStore } from "@/lib/hooks/useGlobalStore";
+import { TradingMode } from "@/lib/types";
 
 export function TradingModeButtons() {
   const { tradingMode, setTradingMode } = useGlobalStore();
