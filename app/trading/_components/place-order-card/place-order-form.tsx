@@ -27,7 +27,7 @@ import {
 import { fetchTicker, TickerResponse } from "@/lib/api/ticker";
 import { FilterType, OrderSide } from "@/lib/types";
 
-import { usePlaceOrderCardContext } from "../../_contexts/place-order-card-context";
+import { usePlaceOrderCardContext } from "./context";
 
 function usePriceDecimalDigits() {
   const searchParams = useSearchParams();

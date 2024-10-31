@@ -20,7 +20,8 @@ import { Button } from "@/components/ui/button";
 import { FilterType, KlineInterval } from "@/lib/types";
 
 import useKlineStream from "../../../../lib/streams/useKlineStream";
-import { useSymbolDataCardContext } from "../../_contexts/symbol-data-card-context";
+
+import { useSymbolDataCardContext } from "./context";
 
 function useChartPriceFormat(): DeepPartial<PriceFormat> {
   const searchParams = useSearchParams();

@@ -11,8 +11,7 @@ import {
 } from "@/lib/api/ticker24hr";
 import { KlineInterval } from "@/lib/types";
 
-import { SymbolDataCardProvider } from "../../_contexts/symbol-data-card-context";
-
+import { SymbolDataCardProvider } from "./context";
 import { KlineChart } from "./kline-chart";
 import { KlineIntervalCombobox } from "./kline-interval-combobox";
 import { SymbolTicker } from "./symbol-ticker";

@@ -3,8 +3,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchExchangeInfo } from "@/lib/api/exchange-info";
 
-import { PlaceOrderCardProvider } from "../../_contexts/place-order-card-context";
-
+import { PlaceOrderCardProvider } from "./context";
 import { PlaceOrderForm } from "./place-order-form";
 
 export default async function PlaceOrderCard() {

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-import { useSymbolDataCardContext } from "../../_contexts/symbol-data-card-context";
+import { useSymbolDataCardContext } from "./context";
 
 function useSymbols() {
   const { exchangeInfoResponse, ticker24hrAllSymbolsResponse } =

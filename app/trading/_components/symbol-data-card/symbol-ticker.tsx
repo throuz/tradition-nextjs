@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { useTickerStream } from "../../../../lib/streams/useTickerStream";
-import { useSymbolDataCardContext } from "../../_contexts/symbol-data-card-context";
 
+import { useSymbolDataCardContext } from "./context";
 import { SymbolCombobox } from "./symbol-combobox";
 
 export function SymbolTicker() {
