@@ -184,6 +184,7 @@ export enum TradingMode {
 }
 
 export interface Position {
+  id: string;
   fundingAmount: number;
   symbol: string;
   size: number;
