@@ -9,7 +9,7 @@ import { NavLinks } from "./nav-links";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 flex h-20 justify-between items-center gap-4 border-b bg-background px-6 md:px-8">
+    <header className="sticky top-0 flex h-20 justify-between items-center gap-4 border-b bg-background px-6 md:px-8 z-10">
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="shrink-0 md:hidden">
