@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   BarData,
-  CandlestickData,
   createChart,
   CrosshairMode,
   DeepPartial,
   ISeriesApi,
   LineStyle,
-  PriceFormat,
   Time,
   TimeChartOptions,
 } from "lightweight-charts";
@@ -17,49 +15,12 @@ import { RefreshCcw } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { FilterType, KlineInterval } from "@/lib/types";
+import { KlineInterval } from "@/lib/types";
 
-import useKlineStream from "../../../../lib/streams/useKlineStream";
+import useKlineStream from "../../../../lib/streams/use-kline-stream";
 
-import { useSymbolDataCardContext } from "./context";
-
-function useChartPriceFormat(): DeepPartial<PriceFormat> {
-  const searchParams = useSearchParams();
-  const symbol = searchParams.get("symbol");
-  const { exchangeInfoResponse } = useSymbolDataCardContext();
-
-  const chartPriceFormat = useMemo<DeepPartial<PriceFormat>>(() => {
-    const foundSymbolInfo = exchangeInfoResponse.symbols.find(
-      (symbolInfo) => symbolInfo.symbol === symbol
-    );
-
-    const minMove = Number(
-      foundSymbolInfo?.filters.find(
-        (item) => item.filterType === FilterType.PriceFilter
-      )?.tickSize
-    );
-
-    return { type: "price", minMove };
-  }, [exchangeInfoResponse.symbols, symbol]);
-
-  return chartPriceFormat;
-}
-
-function useCandlestickDatas(): CandlestickData[] {
-  const { klinesResponse } = useSymbolDataCardContext();
-
-  const candlestickDatas = useMemo<CandlestickData[]>(() => {
-    return klinesResponse.map((kline) => ({
-      time: (kline[0] / 1000) as Time,
-      open: Number(kline[1]),
-      high: Number(kline[2]),
-      low: Number(kline[3]),
-      close: Number(kline[4]),
-    }));
-  }, [klinesResponse]);
-
-  return candlestickDatas;
-}
+import { useCandlestickDatas } from "./use-candlestick-datas";
+import { useChartPriceFormat } from "./use-chart-price-format";
 
 export function KlineChart() {
   const chartContainerRef = useRef<HTMLDivElement>(null);
