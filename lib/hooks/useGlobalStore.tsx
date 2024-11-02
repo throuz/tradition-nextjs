@@ -4,6 +4,9 @@ import { persist } from "zustand/middleware";
 import { Position, TradingMode } from "../types";
 
 export type GlobalStore = {
+  availableBalance: number;
+  increaseAvailableBalance: (increaseAmount: number) => void;
+  decreaseAvailableBalance: (decreaseAmount: number) => void;
   positions: Position[];
   openPosition: (position: Position) => void;
   closePosition: (id: string) => void;
@@ -14,6 +17,15 @@ export type GlobalStore = {
 export const useGlobalStore = create<GlobalStore>()(
   persist(
     (set, get) => ({
+      availableBalance: 0,
+      increaseAvailableBalance: (increaseAmount) => {
+        const { availableBalance } = get();
+        set({ availableBalance: availableBalance + increaseAmount });
+      },
+      decreaseAvailableBalance: (decreaseAmount) => {
+        const { availableBalance } = get();
+        set({ availableBalance: availableBalance - decreaseAmount });
+      },
       positions: [],
       openPosition: (position) => {
         const { positions } = get();

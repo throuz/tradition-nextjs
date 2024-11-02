@@ -189,6 +189,5 @@ export interface Position {
   symbol: string;
   size: number;
   entryPrice: number;
-  lastPrice: number;
   liqPrice: number;
 }
