@@ -25,10 +25,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { fetchTicker, TickerResponse } from "@/lib/api/ticker";
+import { useGlobalStore } from "@/lib/hooks/useGlobalStore";
 import { FilterType, OrderSide } from "@/lib/types";
 
 import { usePlaceOrderCardContext } from "./context";
 import { TradingModeButtons } from "./trading-mode-buttons";
+import { useAvailableBalance } from "./use-available-balance";
 
 function usePriceDecimalDigits() {
   const searchParams = useSearchParams();
@@ -86,7 +88,7 @@ const validateTPSL = (
 };
 
 export function PlaceOrderForm() {
-  const availableBalance = 1000; // Example balance; replace with actual balance from context/store
+  const availableBalance = useAvailableBalance();
 
   const searchParams = useSearchParams();
   const symbol = searchParams.get("symbol");
