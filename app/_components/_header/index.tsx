@@ -1,5 +1,4 @@
 import { Menu } from "lucide-react";
-import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -8,7 +7,7 @@ import { AccountBalance } from "./account-balance";
 import { ConnectWalletButton } from "./connect-wallet-button";
 import { DepositButton } from "./deposit-button";
 import { NavLinks } from "./nav-links";
-import { TradingModeButtons } from "./trading-mode-buttons";
+import { TradingModeSelector } from "./trading-mode-selector";
 import { WithdrawButton } from "./withdraw-button";
 
 export default function Header() {
@@ -36,7 +35,7 @@ export default function Header() {
         <AccountBalance />
         <DepositButton />
         <WithdrawButton />
-        <TradingModeButtons />
+        <TradingModeSelector />
         <ConnectWalletButton />
       </div>
     </header>
