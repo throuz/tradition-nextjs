@@ -18,6 +18,13 @@ export function NavLinks() {
 
   return (
     <>
+      <Link
+        href="/"
+        className="flex items-center gap-2 text-xl font-semibold md:text-2xl italic"
+      >
+        Tradixion
+        <span className="sr-only">Tradixion</span>
+      </Link>
       {links.map((link) => {
         return (
           <Link

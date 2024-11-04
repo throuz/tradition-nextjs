@@ -4,8 +4,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
+import { AccountBalance } from "./account-balance";
 import { ConnectWalletButton } from "./connect-wallet-button";
+import { DepositButton } from "./deposit-button";
 import { NavLinks } from "./nav-links";
+import { TradingModeButtons } from "./trading-mode-buttons";
+import { WithdrawButton } from "./withdraw-button";
 
 export default function Header() {
   return (
@@ -23,17 +27,18 @@ export default function Header() {
           </nav>
         </SheetContent>
       </Sheet>
-      <Link
-        href="/"
-        className="flex items-center gap-2 text-xl font-semibold md:text-2xl italic"
-      >
-        Tradixion
-        <span className="sr-only">Tradixion</span>
-      </Link>
+
       <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-6">
         <NavLinks />
       </nav>
-      <ConnectWalletButton />
+
+      <div className="flex items-center gap-4">
+        <AccountBalance />
+        <DepositButton />
+        <WithdrawButton />
+        <TradingModeButtons />
+        <ConnectWalletButton />
+      </div>
     </header>
   );
 }

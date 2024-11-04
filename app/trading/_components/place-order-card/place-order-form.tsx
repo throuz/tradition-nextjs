@@ -27,8 +27,8 @@ import {
 import { fetchTicker, TickerResponse } from "@/lib/api/ticker";
 import { OrderSide } from "@/lib/types";
 
-import { TradingModeButtons } from "./trading-mode-buttons";
-import { useAvailableBalance } from "./use-available-balance";
+import { useAvailableBalance } from "../../../../lib/hooks/use-available-balance";
+
 import { usePriceDecimalDigits } from "./use-price-decimal-digits";
 
 const validateTPSL = (
@@ -150,13 +150,6 @@ export function PlaceOrderForm() {
         onSubmit={form.handleSubmit(handleOrderPlacement)}
         className="space-y-4"
       >
-        <FormItem>
-          <FormLabel>Trading Mode</FormLabel>
-          <TradingModeButtons />
-        </FormItem>
-
-        <div>Available Balance: ${availableBalance.toFixed(2)}</div>
-
         <FormField
           control={form.control}
           name="orderSide"
