@@ -86,14 +86,14 @@ export function PlaceOrderForm() {
       }),
     takeProfitPrice: z
       .number()
-      .positive()
+      .positive({ message: "Take Profit Price must be positive" })
       .refine((value) => Number(value.toFixed(priceDecimalDigits)) === value, {
         message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places`,
       })
       .optional(),
     stopLossPrice: z
       .number()
-      .positive()
+      .positive({ message: "Stop Loss Price must be positive" })
       .refine((value) => Number(value.toFixed(priceDecimalDigits)) === value, {
         message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places`,
       })
