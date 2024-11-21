@@ -116,11 +116,10 @@ const usePlaceOrderForm = () => {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = form.handleSubmit(
-    async (values: z.infer<typeof formSchema>) => {
-      toast.success(`Order placed: ${JSON.stringify(values)}`);
-    }
-  );
+  const onSubmit = form.handleSubmit((values: z.infer<typeof formSchema>) => {
+    toast.success(`Order placed: ${JSON.stringify(values)}`);
+    form.reset();
+  });
 
   return { form, onSubmit };
 };
