@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchExchangeInfo } from "@/lib/api/exchange-info";
 
 import { PlaceOrderCardProvider } from "./context";
-import { PlaceOrderForm } from "./place-order-form";
+import PlaceOrderForm from "./place-order-form";
 
 export default async function PlaceOrderCard() {
   const exchangeInfoResponse = await fetchExchangeInfo();
