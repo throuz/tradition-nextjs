@@ -18,3 +18,15 @@ export const formatChainAsNum = (chainIdHex: string) => {
 export const formatAddress = (addr: string | undefined) => {
   return `${addr?.substring(0, 8)}...`;
 };
+
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  return (...args: Parameters<T>) => {
+    if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+}
