@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { z } from "zod";
+import { z, ZodIssueCode } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,115 +31,94 @@ import { useAvailableBalance } from "../../../../lib/hooks/use-available-balance
 
 import { usePriceDecimalDigits } from "./use-price-decimal-digits";
 
-const validateTPSL = (
-  orderSide: OrderSide,
-  latestPrice: number,
-  takeProfitPrice?: number,
-  stopLossPrice?: number
-): { takeProfitPrice?: string; stopLossPrice?: string } => {
-  const errors: { takeProfitPrice?: string; stopLossPrice?: string } = {};
-
-  if (orderSide === OrderSide.Buy) {
-    if (takeProfitPrice !== undefined && takeProfitPrice <= latestPrice) {
-      errors.takeProfitPrice = `Take Profit Price must be greater than ${latestPrice}.`;
-    }
-    if (stopLossPrice !== undefined && stopLossPrice >= latestPrice) {
-      errors.stopLossPrice = `Stop Loss Price must be less than ${latestPrice}.`;
-    }
-  }
-
-  if (orderSide === OrderSide.Sell) {
-    if (takeProfitPrice !== undefined && takeProfitPrice >= latestPrice) {
-      errors.takeProfitPrice = `Take Profit Price must be less than ${latestPrice}.`;
-    }
-    if (stopLossPrice !== undefined && stopLossPrice <= latestPrice) {
-      errors.stopLossPrice = `Stop Loss Price must be greater than ${latestPrice}.`;
-    }
-  }
-
-  return errors;
-};
-
 export function PlaceOrderForm() {
   const availableBalance = useAvailableBalance();
   const priceDecimalDigits = usePriceDecimalDigits();
   const searchParams = useSearchParams();
   const symbol = searchParams.get("symbol");
 
-  const formSchema = z.object({
-    orderSide: z.nativeEnum(OrderSide),
-    leverage: z
-      .number()
-      .int({ message: "Leverage must be an integer" })
-      .min(1, { message: "Leverage must be at least 1" })
-      .max(200, { message: "Leverage cannot exceed 200" }),
-    amount: z
-      .number()
-      .min(0.01, { message: "Amount must be at least 0.01" })
-      .max(availableBalance, {
-        message: `Amount cannot exceed ${availableBalance}`,
-      })
-      .refine((value) => Number(value.toFixed(2)) === value, {
-        message: "Amount can have at most 2 decimal places",
-      }),
-    takeProfitPrice: z
-      .number()
-      .positive({ message: "Take Profit Price must be positive" })
-      .refine((value) => Number(value.toFixed(priceDecimalDigits)) === value, {
-        message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places`,
-      })
-      .optional(),
-    stopLossPrice: z
-      .number()
-      .positive({ message: "Stop Loss Price must be positive" })
-      .refine((value) => Number(value.toFixed(priceDecimalDigits)) === value, {
-        message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places`,
-      })
-      .optional(),
-  });
+  const formSchema = z
+    .object({
+      orderSide: z.nativeEnum(OrderSide),
+      leverage: z
+        .number()
+        .int({ message: "Leverage must be an integer" })
+        .min(1, { message: "Leverage must be at least 1" })
+        .max(200, { message: "Leverage cannot exceed 200" }),
+      amount: z
+        .number()
+        .min(0.01, { message: "Amount must be at least 0.01" })
+        .max(availableBalance, {
+          message: `Amount cannot exceed ${availableBalance}`,
+        })
+        .refine((value) => Number(value.toFixed(2)) === value, {
+          message: "Amount can have at most 2 decimal places",
+        }),
+      takeProfitPrice: z
+        .number()
+        .positive({ message: "Take Profit Price must be positive" })
+        .refine(
+          (value) => Number(value.toFixed(priceDecimalDigits)) === value,
+          {
+            message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places`,
+          }
+        )
+        .optional(),
+      stopLossPrice: z
+        .number()
+        .positive({ message: "Stop Loss Price must be positive" })
+        .refine(
+          (value) => Number(value.toFixed(priceDecimalDigits)) === value,
+          {
+            message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places`,
+          }
+        )
+        .optional(),
+    })
+    .superRefine(async (values, ctx) => {
+      const tickerResponse = await fetchTicker(symbol ?? "");
+      const latestPrice = Number(tickerResponse.price);
+      const { orderSide, takeProfitPrice, stopLossPrice } = values;
+      if (orderSide === OrderSide.Buy) {
+        if (takeProfitPrice !== undefined && takeProfitPrice <= latestPrice) {
+          ctx.addIssue({
+            code: ZodIssueCode.custom,
+            path: ["takeProfitPrice"],
+            message: `Take Profit Price must be greater than ${latestPrice}.`,
+          });
+        }
+        if (stopLossPrice !== undefined && stopLossPrice >= latestPrice) {
+          ctx.addIssue({
+            code: ZodIssueCode.custom,
+            path: ["stopLossPrice"],
+            message: `Stop Loss Price must be less than ${latestPrice}.`,
+          });
+        }
+      }
+      if (orderSide === OrderSide.Sell) {
+        if (takeProfitPrice !== undefined && takeProfitPrice >= latestPrice) {
+          ctx.addIssue({
+            code: ZodIssueCode.custom,
+            path: ["takeProfitPrice"],
+            message: `Take Profit Price must be less than ${latestPrice}.`,
+          });
+        }
+        if (stopLossPrice !== undefined && stopLossPrice <= latestPrice) {
+          ctx.addIssue({
+            code: ZodIssueCode.custom,
+            path: ["stopLossPrice"],
+            message: `Stop Loss Price must be greater than ${latestPrice}.`,
+          });
+        }
+      }
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  const validateValues = async (
-    values: z.infer<typeof formSchema>
-  ): Promise<boolean> => {
-    try {
-      const { price: latestPrice } = (await fetchTicker(
-        symbol ?? undefined
-      )) as TickerResponse;
-
-      const { orderSide, takeProfitPrice, stopLossPrice } = values;
-
-      const { takeProfitPrice: takeProfitError, stopLossPrice: stopLossError } =
-        validateTPSL(
-          orderSide,
-          Number(latestPrice),
-          takeProfitPrice,
-          stopLossPrice
-        );
-
-      if (takeProfitError) {
-        form.setError("takeProfitPrice", { message: takeProfitError });
-      }
-      if (stopLossError) {
-        form.setError("stopLossPrice", { message: stopLossError });
-      }
-
-      return !takeProfitError && !stopLossError;
-    } catch (error) {
-      form.setError("root", { message: "Unknown error" });
-      return false;
-    }
-  };
-
   const handleOrderPlacement = async (values: z.infer<typeof formSchema>) => {
-    const isValid = await validateValues(values);
-
-    if (isValid) {
-      toast.success(`Order placed: ${JSON.stringify(values)}`);
-    }
+    toast.success(`Order placed: ${JSON.stringify(values)}`);
   };
 
   return (
