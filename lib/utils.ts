@@ -1,6 +1,8 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+import { OrderSide } from "./types";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -29,4 +31,26 @@ export function debounce<T extends (...args: any[]) => any>(
     if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
   };
+}
+
+export function calculateLiqPrice({
+  orderSide,
+  leverage,
+  entryPrice,
+}: {
+  orderSide: OrderSide;
+  leverage: number;
+  entryPrice: number;
+}): number | null {
+  if (leverage <= 0 || entryPrice <= 0) {
+    throw new Error("Leverage and entry price must be positive.");
+  }
+
+  if (orderSide === OrderSide.Buy) {
+    return entryPrice * (1 - 1 / leverage);
+  } else if (orderSide === OrderSide.Sell) {
+    return entryPrice * (1 + 1 / leverage);
+  }
+
+  return null;
 }

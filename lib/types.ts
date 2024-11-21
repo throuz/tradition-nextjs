@@ -185,9 +185,12 @@ export enum TradingMode {
 
 export interface Position {
   id: string;
+  orderSide: OrderSide;
   fundingAmount: number;
   symbol: string;
   size: number;
   entryPrice: number;
   liqPrice: number;
+  takeProfitPrice?: number;
+  stopLossPrice?: number;
 }

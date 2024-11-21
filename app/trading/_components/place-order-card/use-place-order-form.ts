@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
@@ -5,13 +6,17 @@ import { toast } from "sonner";
 import { z, ZodIssueCode } from "zod";
 
 import { fetchTicker } from "@/lib/api/ticker";
+import { useGlobalStore } from "@/lib/hooks/use-global-store";
 import { OrderSide } from "@/lib/types";
+import { calculateLiqPrice } from "@/lib/utils";
 
 import { useAvailableBalance } from "../../../../lib/hooks/use-available-balance";
 
 import { usePriceDecimalDigits } from "./use-price-decimal-digits";
 
 const usePlaceOrderForm = () => {
+  const id = useId();
+  const { decreaseAvailableBalance, openPosition } = useGlobalStore();
   const availableBalance = useAvailableBalance();
   const priceDecimalDigits = usePriceDecimalDigits();
   const searchParams = useSearchParams();
@@ -116,10 +121,34 @@ const usePlaceOrderForm = () => {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = form.handleSubmit((values: z.infer<typeof formSchema>) => {
-    toast.success(`Order placed: ${JSON.stringify(values)}`);
-    form.reset();
-  });
+  const onSubmit = form.handleSubmit(
+    async (values: z.infer<typeof formSchema>) => {
+      try {
+        const { orderSide, leverage, amount, takeProfitPrice, stopLossPrice } =
+          values;
+        const tickerResponse = await fetchTicker(symbol ?? "");
+        const entryPrice = Number(tickerResponse.price);
+        const size = (amount * leverage) / entryPrice;
+        const liqPrice = calculateLiqPrice({ orderSide, leverage, entryPrice });
+        openPosition({
+          id: id,
+          orderSide: orderSide,
+          fundingAmount: amount,
+          symbol: symbol as string,
+          size: size,
+          entryPrice: entryPrice,
+          liqPrice: liqPrice as number,
+          takeProfitPrice: takeProfitPrice,
+          stopLossPrice: stopLossPrice,
+        });
+        decreaseAvailableBalance(amount);
+        toast.success(`Order placed: ${JSON.stringify(values)}`);
+        form.reset();
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
+    }
+  );
 
   return { form, onSubmit };
 };
