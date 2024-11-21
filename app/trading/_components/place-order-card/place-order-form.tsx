@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { fetchTicker, TickerResponse } from "@/lib/api/ticker";
+import { fetchTicker } from "@/lib/api/ticker";
 import { OrderSide } from "@/lib/types";
 
 import { useAvailableBalance } from "../../../../lib/hooks/use-available-balance";
