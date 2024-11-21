@@ -67,9 +67,7 @@ export function PlaceOrderForm() {
   const symbol = searchParams.get("symbol");
 
   const formSchema = z.object({
-    orderSide: z.nativeEnum(OrderSide, {
-      errorMap: () => ({ message: "Invalid order side" }),
-    }),
+    orderSide: z.nativeEnum(OrderSide),
     leverage: z
       .number()
       .int({ message: "Leverage must be an integer" })
