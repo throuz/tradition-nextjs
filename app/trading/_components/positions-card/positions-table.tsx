@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGlobalStore } from "@/lib/hooks/use-global-store";
+import { OrderSide } from "@/lib/types";
 
 export function PositionsTable() {
   const { positions } = useGlobalStore();
@@ -30,34 +31,48 @@ export function PositionsTable() {
       </TableHeader>
       <TableBody>
         {positions.map((position) => {
+          const {
+            id,
+            orderSide,
+            fundingAmount,
+            symbol,
+            size,
+            entryPrice,
+            liqPrice,
+            takeProfitPrice,
+            stopLossPrice,
+          } = position;
+
+          const orderSideMap: Record<OrderSide, string> = {
+            [OrderSide.Buy]: "Buy",
+            [OrderSide.Sell]: "Sell",
+          };
+
           // Placeholder for last price (replace with real data source)
-          const lastPrice =
-            position.entryPrice * (position.orderSide === "BUY" ? 1.05 : 0.95);
+          const lastPrice = entryPrice * (1 + (Math.random() * 0.02 - 0.01));
+
           const pnl =
-            (lastPrice - position.entryPrice) *
-            position.size *
-            (position.orderSide === "BUY" ? 1 : -1);
-          const roi =
-            (lastPrice / position.entryPrice - 1) *
-            100 *
-            (position.orderSide === "BUY" ? 1 : -1);
+            (lastPrice - entryPrice) *
+            size *
+            (orderSide === OrderSide.Buy ? 1 : -1);
+          const roi = (pnl / fundingAmount) * 100;
 
           return (
-            <TableRow key={position.id}>
+            <TableRow key={id}>
               <TableCell className="font-medium text-center">
-                {position.symbol}
+                {symbol}
               </TableCell>
               <TableCell className="text-center">
-                {position.orderSide === "BUY" ? "Buy" : "Sell"}
+                {orderSideMap[orderSide]}
               </TableCell>
               <TableCell className="text-center">
-                {position.size.toLocaleString(undefined, {
+                {size.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                 })}{" "}
-                {position.symbol.replace(/USDT$/, "")}
+                {symbol.replace(/USDT$/, "")}
               </TableCell>
               <TableCell className="text-center">
-                ${position.entryPrice.toLocaleString()}
+                ${entryPrice.toLocaleString()}
               </TableCell>
               <TableCell className="text-center">
                 ${lastPrice.toLocaleString()}
@@ -70,7 +85,7 @@ export function PositionsTable() {
                 {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} ({roi.toFixed(2)}%)
               </TableCell>
               <TableCell className="text-center">
-                ${position.liqPrice.toLocaleString()}
+                ${liqPrice.toLocaleString()}
               </TableCell>
               <TableCell className="text-center">
                 <Button variant="destructive" className="bg-red-700">
