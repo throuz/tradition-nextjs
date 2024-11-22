@@ -57,6 +57,14 @@ export function PositionsTable() {
             (orderSide === OrderSide.Buy ? 1 : -1);
           const roi = (pnl / fundingAmount) * 100;
 
+          const formatPnlAndRoi = (pnl: number, roi: number) => {
+            const formattedPnl = `${pnl < 0 ? "-" : ""}$${Math.abs(pnl).toFixed(
+              2
+            )}`;
+            const formattedRoi = `(${roi.toFixed(2)}%)`;
+            return `${formattedPnl} ${formattedRoi}`;
+          };
+
           return (
             <TableRow key={id}>
               <TableCell className="font-medium text-center">
@@ -82,7 +90,7 @@ export function PositionsTable() {
                   pnl >= 0 ? "text-green-600" : "text-red-600"
                 }`}
               >
-                {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} ({roi.toFixed(2)}%)
+                {formatPnlAndRoi(pnl, roi)}
               </TableCell>
               <TableCell className="text-center">
                 ${liqPrice.toLocaleString()}
