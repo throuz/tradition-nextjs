@@ -42,26 +42,32 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
 
   const formSchema = z
     .object({
-      takeProfitPrice: z
-        .number()
-        .positive({ message: "Take Profit Price must be positive" })
-        .refine(
-          (value) => Number(value.toFixed(priceDecimalDigits)) === value,
-          {
-            message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places`,
-          }
-        )
-        .optional(),
-      stopLossPrice: z
-        .number()
-        .positive({ message: "Stop Loss Price must be positive" })
-        .refine(
-          (value) => Number(value.toFixed(priceDecimalDigits)) === value,
-          {
-            message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places`,
-          }
-        )
-        .optional(),
+      takeProfitPrice: z.preprocess(
+        (val) => (val ? Number(val) : undefined),
+        z
+          .number()
+          .positive({ message: "Take Profit Price must be positive" })
+          .refine(
+            (value) => Number(value.toFixed(priceDecimalDigits)) === value,
+            {
+              message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places`,
+            }
+          )
+          .optional()
+      ),
+      stopLossPrice: z.preprocess(
+        (val) => (val ? Number(val) : undefined),
+        z
+          .number()
+          .positive({ message: "Stop Loss Price must be positive" })
+          .refine(
+            (value) => Number(value.toFixed(priceDecimalDigits)) === value,
+            {
+              message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places`,
+            }
+          )
+          .optional()
+      ),
     })
     .superRefine(async (values, ctx) => {
       const { symbol, orderSide } = position;
@@ -174,15 +180,8 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
                     <Input
                       type="number"
                       placeholder="Set take profit price"
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        field.onChange(
-                          value === "" ? undefined : Number(event.target.value)
-                        );
-                      }}
                       className={fieldState.invalid ? "border-error" : ""}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage
@@ -203,15 +202,8 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
                     <Input
                       type="number"
                       placeholder="Set stop loss price"
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        field.onChange(
-                          value === "" ? undefined : Number(event.target.value)
-                        );
-                      }}
                       className={fieldState.invalid ? "border-error" : ""}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage
