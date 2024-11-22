@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { useGlobalStore } from "@/lib/hooks/use-global-store";
 import { OrderSide } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export function PositionsTable() {
   const { positions } = useGlobalStore();
@@ -56,21 +57,26 @@ export function PositionsTable() {
             size *
             (orderSide === OrderSide.Buy ? 1 : -1);
           const roi = (pnl / fundingAmount) * 100;
-
-          const formatPnlAndRoi = (pnl: number, roi: number) => {
-            const formattedPnl = `${pnl < 0 ? "-" : ""}$${Math.abs(pnl).toFixed(
-              2
-            )}`;
-            const formattedRoi = `(${roi.toFixed(2)}%)`;
-            return `${formattedPnl} ${formattedRoi}`;
-          };
+          const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(
+            2
+          )}`;
+          const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi).toFixed(
+            2
+          )}%`;
+          const pnlroi = `${formattedPnl} (${formattedRoi})`;
 
           return (
             <TableRow key={id}>
               <TableCell className="font-medium text-center">
                 {symbol}
               </TableCell>
-              <TableCell className="text-center">
+              <TableCell
+                className={cn(
+                  "text-center",
+                  orderSide === OrderSide.Buy && "text-green-500",
+                  orderSide === OrderSide.Sell && "text-red-500"
+                )}
+              >
                 {orderSideMap[orderSide]}
               </TableCell>
               <TableCell className="text-center">
@@ -86,11 +92,12 @@ export function PositionsTable() {
                 ${lastPrice.toLocaleString()}
               </TableCell>
               <TableCell
-                className={`text-center ${
-                  pnl >= 0 ? "text-green-600" : "text-red-600"
-                }`}
+                className={cn(
+                  "text-center",
+                  pnl >= 0 ? "text-green-500" : "text-red-500"
+                )}
               >
-                {formatPnlAndRoi(pnl, roi)}
+                {pnlroi}
               </TableCell>
               <TableCell className="text-center">
                 ${liqPrice.toLocaleString()}
