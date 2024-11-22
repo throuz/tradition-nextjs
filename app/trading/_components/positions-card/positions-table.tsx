@@ -8,31 +8,36 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { OrderSide, Position } from "@/lib/types";
 
-const positions = [
+// Sample positions data
+const positions: Position[] = [
   {
+    id: "1",
+    orderSide: OrderSide.Buy,
+    fundingAmount: 1000,
     symbol: "BTCUSDT",
-    size: "0.5 BTC",
-    entryPrice: "$30,000",
-    lastPrice: "$32,000",
-    pnl: "+$1,000 (5%)",
-    liqPrice: "$25,000",
+    size: 0.5,
+    entryPrice: 30000,
+    liqPrice: 25000,
   },
   {
+    id: "2",
+    orderSide: OrderSide.Sell,
+    fundingAmount: 5000,
     symbol: "ETHUSDT",
-    size: "10 ETH",
-    entryPrice: "$1,500",
-    lastPrice: "$1,700",
-    pnl: "+$2,000 (13%)",
-    liqPrice: "$1,200",
+    size: 10,
+    entryPrice: 1500,
+    liqPrice: 1200,
   },
   {
+    id: "3",
+    orderSide: OrderSide.Buy,
+    fundingAmount: 250,
     symbol: "XRPUSDT",
-    size: "500 XRP",
-    entryPrice: "$0.50",
-    lastPrice: "$0.48",
-    pnl: "-$10 (-4%)",
-    liqPrice: "$0.30",
+    size: 500,
+    entryPrice: 0.5,
+    liqPrice: 0.3,
   },
 ];
 
@@ -43,6 +48,7 @@ export function PositionsTable() {
       <TableHeader>
         <TableRow>
           <TableHead className="text-center">Symbol</TableHead>
+          <TableHead className="text-center">Side</TableHead>
           <TableHead className="text-center">Size</TableHead>
           <TableHead className="text-center">Entry Price</TableHead>
           <TableHead className="text-center">Last Price</TableHead>
@@ -52,23 +58,57 @@ export function PositionsTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {positions.map((position) => (
-          <TableRow key={position.symbol}>
-            <TableCell className="font-medium text-center">
-              {position.symbol}
-            </TableCell>
-            <TableCell className="text-center">{position.size}</TableCell>
-            <TableCell className="text-center">{position.entryPrice}</TableCell>
-            <TableCell className="text-center">{position.lastPrice}</TableCell>
-            <TableCell className="text-center">{position.pnl}</TableCell>
-            <TableCell className="text-center">{position.liqPrice}</TableCell>
-            <TableCell className="text-center">
-              <Button variant="destructive" className="bg-red-700">
-                Close
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
+        {positions.map((position) => {
+          // Placeholder for last price (replace with real data source)
+          const lastPrice =
+            position.entryPrice * (position.orderSide === "BUY" ? 1.05 : 0.95);
+          const pnl =
+            (lastPrice - position.entryPrice) *
+            position.size *
+            (position.orderSide === "BUY" ? 1 : -1);
+          const roi =
+            (lastPrice / position.entryPrice - 1) *
+            100 *
+            (position.orderSide === "BUY" ? 1 : -1);
+
+          return (
+            <TableRow key={position.id}>
+              <TableCell className="font-medium text-center">
+                {position.symbol}
+              </TableCell>
+              <TableCell className="text-center">
+                {position.orderSide === "BUY" ? "Buy" : "Sell"}
+              </TableCell>
+              <TableCell className="text-center">
+                {position.size.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                })}{" "}
+                {position.symbol.replace(/USDT$/, "")}
+              </TableCell>
+              <TableCell className="text-center">
+                ${position.entryPrice.toLocaleString()}
+              </TableCell>
+              <TableCell className="text-center">
+                ${lastPrice.toLocaleString()}
+              </TableCell>
+              <TableCell
+                className={`text-center ${
+                  pnl >= 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} ({roi.toFixed(2)}%)
+              </TableCell>
+              <TableCell className="text-center">
+                ${position.liqPrice.toLocaleString()}
+              </TableCell>
+              <TableCell className="text-center">
+                <Button variant="destructive" className="bg-red-700">
+                  Close
+                </Button>
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
