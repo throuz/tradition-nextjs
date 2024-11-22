@@ -106,10 +106,10 @@ export function PositionsTable() {
                 ${liqPrice.toLocaleString()}
               </TableCell>
               <TableCell className="text-center">
-                {takeProfitPrice ? `${takeProfitPrice.toLocaleString()}` : "-"}
+                {takeProfitPrice ? `$${takeProfitPrice.toLocaleString()}` : "-"}
               </TableCell>
               <TableCell className="text-center">
-                {stopLossPrice ? `${stopLossPrice.toLocaleString()}` : "-"}
+                {stopLossPrice ? `$${stopLossPrice.toLocaleString()}` : "-"}
               </TableCell>
               <TableCell className="flex gap-2 justify-center">
                 <TPSLButton position={position} />
