@@ -8,40 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { OrderSide, Position } from "@/lib/types";
-
-// Sample positions data
-const positions: Position[] = [
-  {
-    id: "1",
-    orderSide: OrderSide.Buy,
-    fundingAmount: 1000,
-    symbol: "BTCUSDT",
-    size: 0.5,
-    entryPrice: 30000,
-    liqPrice: 25000,
-  },
-  {
-    id: "2",
-    orderSide: OrderSide.Sell,
-    fundingAmount: 5000,
-    symbol: "ETHUSDT",
-    size: 10,
-    entryPrice: 1500,
-    liqPrice: 1200,
-  },
-  {
-    id: "3",
-    orderSide: OrderSide.Buy,
-    fundingAmount: 250,
-    symbol: "XRPUSDT",
-    size: 500,
-    entryPrice: 0.5,
-    liqPrice: 0.3,
-  },
-];
+import { useGlobalStore } from "@/lib/hooks/use-global-store";
 
 export function PositionsTable() {
+  const { positions } = useGlobalStore();
+
   return (
     <Table>
       <TableCaption>Your open trading positions.</TableCaption>

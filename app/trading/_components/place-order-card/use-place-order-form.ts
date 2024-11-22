@@ -1,6 +1,6 @@
-import { useId } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { nanoid } from "nanoid";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { z, ZodIssueCode } from "zod";
@@ -15,7 +15,6 @@ import { useAvailableBalance } from "../../../../lib/hooks/use-available-balance
 import { usePriceDecimalDigits } from "./use-price-decimal-digits";
 
 const usePlaceOrderForm = () => {
-  const id = useId();
   const { decreaseAvailableBalance, openPosition } = useGlobalStore();
   const availableBalance = useAvailableBalance();
   const priceDecimalDigits = usePriceDecimalDigits();
@@ -124,6 +123,7 @@ const usePlaceOrderForm = () => {
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof formSchema>) => {
       try {
+        const id = nanoid();
         const { orderSide, leverage, amount, takeProfitPrice, stopLossPrice } =
           values;
         const tickerResponse = await fetchTicker(symbol ?? "");
