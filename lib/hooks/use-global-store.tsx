@@ -10,6 +10,7 @@ export type GlobalStore = {
   positions: Position[];
   openPosition: (position: Position) => void;
   closePosition: (id: string) => void;
+  updatePosition: (id: string, updates: Partial<Position>) => void;
   tradingMode: TradingMode;
   setTradingMode: (tradingMode: TradingMode) => void;
 };
@@ -29,16 +30,27 @@ export const useGlobalStore = create<GlobalStore>()(
       positions: [],
       openPosition: (position) => {
         const { positions } = get();
-        positions.push(position);
-        set({ positions });
+        set({ positions: [...positions, position] });
       },
       closePosition: (id) => {
         const { positions } = get();
-        const index = positions.findIndex((position) => position.id === id);
-        if (index !== -1) {
-          positions.splice(index, 1);
+        set({
+          positions: positions.filter((position) => position.id !== id),
+        });
+      },
+      updatePosition: (id, updates) => {
+        const { positions } = get();
+        const positionIndex = positions.findIndex(
+          (position) => position.id === id
+        );
+        if (positionIndex === -1) {
+          console.error(`Position with id ${id} not found`);
+          return;
         }
-        set({ positions });
+        const updatedPositions = positions.map((position) =>
+          position.id === id ? { ...position, ...updates } : position
+        );
+        set({ positions: updatedPositions });
       },
       tradingMode: TradingMode.Demo,
       setTradingMode: (tradingMode) => set({ tradingMode }),

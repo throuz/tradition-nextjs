@@ -12,6 +12,8 @@ import { useGlobalStore } from "@/lib/hooks/use-global-store";
 import { OrderSide } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import TPSLButton from "./tpsl-button";
+
 export function PositionsTable() {
   const { positions } = useGlobalStore();
 
@@ -27,6 +29,8 @@ export function PositionsTable() {
           <TableHead className="text-center">Last Price</TableHead>
           <TableHead className="text-center">PNL (ROI %)</TableHead>
           <TableHead className="text-center">Liq. Price</TableHead>
+          <TableHead className="text-center">Take Profit</TableHead>
+          <TableHead className="text-center">Stop Loss</TableHead>
           <TableHead className="text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -51,7 +55,6 @@ export function PositionsTable() {
 
           // Placeholder for last price (replace with real data source)
           const lastPrice = entryPrice * (1 + (Math.random() * 0.02 - 0.01));
-
           const pnl =
             (lastPrice - entryPrice) *
             size *
@@ -103,6 +106,13 @@ export function PositionsTable() {
                 ${liqPrice.toLocaleString()}
               </TableCell>
               <TableCell className="text-center">
+                {takeProfitPrice ? `${takeProfitPrice.toLocaleString()}` : "-"}
+              </TableCell>
+              <TableCell className="text-center">
+                {stopLossPrice ? `${stopLossPrice.toLocaleString()}` : "-"}
+              </TableCell>
+              <TableCell className="flex gap-2 justify-center">
+                <TPSLButton position={position} />
                 <Button variant="destructive" className="bg-red-700">
                   Close
                 </Button>
