@@ -23,41 +23,56 @@ const usePlaceOrderForm = () => {
 
   const formSchema = z
     .object({
-      orderSide: z.nativeEnum(OrderSide),
-      leverage: z
-        .number()
-        .int({ message: "Leverage must be an integer" })
-        .min(1, { message: "Leverage must be at least 1" })
-        .max(200, { message: "Leverage cannot exceed 200" }),
-      amount: z
-        .number()
-        .min(0.01, { message: "Amount must be at least 0.01" })
-        .max(availableBalance, {
-          message: `Amount cannot exceed ${availableBalance}`,
-        })
-        .refine((value) => Number(value.toFixed(2)) === value, {
-          message: "Amount can have at most 2 decimal places",
-        }),
-      takeProfitPrice: z
-        .number()
-        .positive({ message: "Take Profit Price must be positive" })
-        .refine(
-          (value) => Number(value.toFixed(priceDecimalDigits)) === value,
-          {
-            message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places`,
-          }
-        )
-        .optional(),
-      stopLossPrice: z
-        .number()
-        .positive({ message: "Stop Loss Price must be positive" })
-        .refine(
-          (value) => Number(value.toFixed(priceDecimalDigits)) === value,
-          {
-            message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places`,
-          }
-        )
-        .optional(),
+      orderSide: z.preprocess(
+        (val) => (val ? val : undefined),
+        z.nativeEnum(OrderSide)
+      ),
+      leverage: z.preprocess(
+        (val) => (val ? Number(val) : undefined),
+        z
+          .number()
+          .int({ message: "Leverage must be an integer" })
+          .min(1, { message: "Leverage must be at least 1" })
+          .max(200, { message: "Leverage cannot exceed 200" })
+      ),
+      amount: z.preprocess(
+        (val) => (val ? Number(val) : undefined),
+        z
+          .number()
+          .min(0.01, { message: "Amount must be at least 0.01" })
+          .max(availableBalance, {
+            message: `Amount cannot exceed ${availableBalance}`,
+          })
+          .refine((value) => Number(value.toFixed(2)) === value, {
+            message: "Amount can have at most 2 decimal places",
+          })
+      ),
+      takeProfitPrice: z.preprocess(
+        (val) => (val ? Number(val) : undefined),
+        z
+          .number()
+          .positive({ message: "Take Profit Price must be positive" })
+          .refine(
+            (value) => Number(value.toFixed(priceDecimalDigits)) === value,
+            {
+              message: `Take Profit Price can have at most ${priceDecimalDigits} decimal places`,
+            }
+          )
+          .optional()
+      ),
+      stopLossPrice: z.preprocess(
+        (val) => (val ? Number(val) : undefined),
+        z
+          .number()
+          .positive({ message: "Stop Loss Price must be positive" })
+          .refine(
+            (value) => Number(value.toFixed(priceDecimalDigits)) === value,
+            {
+              message: `Stop Loss Price can have at most ${priceDecimalDigits} decimal places`,
+            }
+          )
+          .optional()
+      ),
     })
     .superRefine(async (values, ctx) => {
       const { orderSide, takeProfitPrice, stopLossPrice } = values;

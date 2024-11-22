@@ -71,15 +71,8 @@ const PlaceOrderForm = () => {
                 <Input
                   type="number"
                   placeholder="Enter leverage"
-                  {...field}
-                  value={field.value ?? ""}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    field.onChange(
-                      value === "" ? undefined : Number(event.target.value)
-                    );
-                  }}
                   className={fieldState.invalid ? "border-error" : ""}
+                  {...field}
                 />
               </FormControl>
               <FormMessage className={fieldState.invalid ? "text-error" : ""} />
@@ -99,15 +92,8 @@ const PlaceOrderForm = () => {
                 <Input
                   type="number"
                   placeholder="Enter amount"
-                  {...field}
-                  value={field.value ?? ""}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    field.onChange(
-                      value === "" ? undefined : Number(event.target.value)
-                    );
-                  }}
                   className={fieldState.invalid ? "border-error" : ""}
+                  {...field}
                 />
               </FormControl>
               <FormMessage className={fieldState.invalid ? "text-error" : ""} />
@@ -127,15 +113,8 @@ const PlaceOrderForm = () => {
                 <Input
                   type="number"
                   placeholder="Set take profit price"
-                  {...field}
-                  value={field.value ?? ""}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    field.onChange(
-                      value === "" ? undefined : Number(event.target.value)
-                    );
-                  }}
                   className={fieldState.invalid ? "border-error" : ""}
+                  {...field}
                 />
               </FormControl>
               <FormMessage className={fieldState.invalid ? "text-error" : ""} />
@@ -155,27 +134,14 @@ const PlaceOrderForm = () => {
                 <Input
                   type="number"
                   placeholder="Set stop loss price"
-                  {...field}
-                  value={field.value ?? ""}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    field.onChange(
-                      value === "" ? undefined : Number(event.target.value)
-                    );
-                  }}
                   className={fieldState.invalid ? "border-error" : ""}
+                  {...field}
                 />
               </FormControl>
               <FormMessage className={fieldState.invalid ? "text-error" : ""} />
             </FormItem>
           )}
         />
-
-        {form.formState.errors.root && (
-          <div className="text-red-500 mb-4">
-            {form.formState.errors.root.message}
-          </div>
-        )}
 
         <Button type="submit">Place Order</Button>
       </form>
