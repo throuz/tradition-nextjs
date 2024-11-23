@@ -140,7 +140,6 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
       try {
         updatePosition(position.id, values);
         toast.success(`TP/SL updated: ${JSON.stringify(values)}`);
-        form.reset();
         setOpen(false);
       } catch (error) {
         toast.error((error as Error).message);
@@ -149,13 +148,7 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
   );
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(open) => {
-        form.reset();
-        setOpen(open);
-      }}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Set TP/SL</Button>
       </DialogTrigger>
