@@ -51,7 +51,12 @@ const usePlaceOrderForm = () => {
         (val) => (val ? Number(val) : undefined),
         z
           .number()
-          .positive({ message: "Take Profit Price must be positive" })
+          .min(0.00000001, {
+            message: "Take Profit Price must be at least 0.00000001",
+          })
+          .max(10000000, {
+            message: "Take Profit Price cannot exceed 10000000",
+          })
           .refine(
             (value) => Number(value.toFixed(priceDecimalDigits)) === value,
             {
@@ -64,7 +69,12 @@ const usePlaceOrderForm = () => {
         (val) => (val ? Number(val) : undefined),
         z
           .number()
-          .positive({ message: "Stop Loss Price must be positive" })
+          .min(0.00000001, {
+            message: "Stop Loss Price must be at least 0.00000001",
+          })
+          .max(10000000, {
+            message: "Stop Loss Price cannot exceed 10000000",
+          })
           .refine(
             (value) => Number(value.toFixed(priceDecimalDigits)) === value,
             {
