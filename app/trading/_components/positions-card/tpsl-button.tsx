@@ -46,7 +46,12 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
         (val) => (val ? Number(val) : undefined),
         z
           .number()
-          .positive({ message: "Take Profit Price must be positive" })
+          .min(0.00000001, {
+            message: "Take Profit Price must be at least 0.00000001",
+          })
+          .max(10000000, {
+            message: "Take Profit Price cannot exceed 10000000",
+          })
           .refine(
             (value) => Number(value.toFixed(priceDecimalDigits)) === value,
             {
@@ -59,7 +64,12 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
         (val) => (val ? Number(val) : undefined),
         z
           .number()
-          .positive({ message: "Stop Loss Price must be positive" })
+          .min(0.00000001, {
+            message: "Stop Loss Price must be at least 0.00000001",
+          })
+          .max(10000000, {
+            message: "Stop Loss Price cannot exceed 10000000",
+          })
           .refine(
             (value) => Number(value.toFixed(priceDecimalDigits)) === value,
             {
@@ -69,60 +79,41 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
           .optional()
       ),
     })
-    .superRefine(async (values, ctx) => {
-      const { symbol, orderSide } = position;
+    .superRefine((values, ctx) => {
+      const { orderSide, entryPrice } = position;
       const { takeProfitPrice, stopLossPrice } = values;
-      try {
-        if (takeProfitPrice || stopLossPrice) {
-          const tickerResponse = await fetchTicker(symbol);
-          const latestPrice = Number(tickerResponse.price);
-          if (orderSide === OrderSide.Buy) {
-            if (takeProfitPrice && takeProfitPrice <= latestPrice) {
-              ctx.addIssue({
-                code: ZodIssueCode.custom,
-                path: ["takeProfitPrice"],
-                message: `Take Profit Price must be greater than ${latestPrice}`,
-              });
-            }
-            if (stopLossPrice && stopLossPrice >= latestPrice) {
-              ctx.addIssue({
-                code: ZodIssueCode.custom,
-                path: ["stopLossPrice"],
-                message: `Stop Loss Price must be less than ${latestPrice}`,
-              });
-            }
+      if (takeProfitPrice || stopLossPrice) {
+        if (orderSide === OrderSide.Buy) {
+          if (takeProfitPrice && takeProfitPrice <= entryPrice) {
+            ctx.addIssue({
+              code: ZodIssueCode.custom,
+              path: ["takeProfitPrice"],
+              message: `Take Profit Price must be greater than ${entryPrice}`,
+            });
           }
-          if (orderSide === OrderSide.Sell) {
-            if (takeProfitPrice && takeProfitPrice >= latestPrice) {
-              ctx.addIssue({
-                code: ZodIssueCode.custom,
-                path: ["takeProfitPrice"],
-                message: `Take Profit Price must be less than ${latestPrice}`,
-              });
-            }
-            if (stopLossPrice && stopLossPrice <= latestPrice) {
-              ctx.addIssue({
-                code: ZodIssueCode.custom,
-                path: ["stopLossPrice"],
-                message: `Stop Loss Price must be greater than ${latestPrice}`,
-              });
-            }
+          if (stopLossPrice && stopLossPrice >= entryPrice) {
+            ctx.addIssue({
+              code: ZodIssueCode.custom,
+              path: ["stopLossPrice"],
+              message: `Stop Loss Price must be less than ${entryPrice}`,
+            });
           }
         }
-      } catch (error) {
-        if (takeProfitPrice) {
-          ctx.addIssue({
-            code: ZodIssueCode.custom,
-            path: ["takeProfitPrice"],
-            message: (error as Error).message,
-          });
-        }
-        if (stopLossPrice) {
-          ctx.addIssue({
-            code: ZodIssueCode.custom,
-            path: ["stopLossPrice"],
-            message: (error as Error).message,
-          });
+        if (orderSide === OrderSide.Sell) {
+          if (takeProfitPrice && takeProfitPrice >= entryPrice) {
+            ctx.addIssue({
+              code: ZodIssueCode.custom,
+              path: ["takeProfitPrice"],
+              message: `Take Profit Price must be less than ${entryPrice}`,
+            });
+          }
+          if (stopLossPrice && stopLossPrice <= entryPrice) {
+            ctx.addIssue({
+              code: ZodIssueCode.custom,
+              path: ["stopLossPrice"],
+              message: `Stop Loss Price must be greater than ${entryPrice}`,
+            });
+          }
         }
       }
     });
