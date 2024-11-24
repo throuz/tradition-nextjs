@@ -30,9 +30,12 @@ export function PositionsTable() {
           <TableHead className="text-center">Entry Price</TableHead>
           <TableHead className="text-center">Last Price</TableHead>
           <TableHead className="text-center">PNL (ROI %)</TableHead>
+          <TableHead className="text-center">Leverage</TableHead>
+          <TableHead className="text-center">Initial Margin</TableHead>
           <TableHead className="text-center">Liq. Price</TableHead>
           <TableHead className="text-center">Take Profit</TableHead>
           <TableHead className="text-center">Stop Loss</TableHead>
+          <TableHead className="text-center">Created At</TableHead>
           <TableHead className="text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -47,6 +50,9 @@ export function PositionsTable() {
             liquidationPrice,
             takeProfitPrice,
             stopLossPrice,
+            leverage,
+            initialMargin,
+            createdAt,
           } = position;
 
           const orderSideMap: Record<OrderSide, string> = {
@@ -60,7 +66,7 @@ export function PositionsTable() {
             (lastPrice - entryPrice) *
             positionSize *
             (side === OrderSide.Buy ? 1 : -1);
-          const roi = (pnl / positionSize) * 100;
+          const roi = (pnl / initialMargin) * 100; // Using initialMargin for ROI calculation
           const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(
             2
           )}`;
@@ -103,6 +109,10 @@ export function PositionsTable() {
               >
                 {pnlroi}
               </TableCell>
+              <TableCell className="text-center">{leverage}</TableCell>
+              <TableCell className="text-center">
+                ${initialMargin.toLocaleString()}
+              </TableCell>
               <TableCell className="text-center">
                 ${liquidationPrice.toLocaleString()}
               </TableCell>
@@ -111,6 +121,9 @@ export function PositionsTable() {
               </TableCell>
               <TableCell className="text-center">
                 {stopLossPrice ? `$${stopLossPrice.toLocaleString()}` : "-"}
+              </TableCell>
+              <TableCell className="text-center">
+                {new Date(createdAt).toLocaleString()}
               </TableCell>
               <TableCell className="flex gap-2 justify-center">
                 <TPSLButton position={position} />
