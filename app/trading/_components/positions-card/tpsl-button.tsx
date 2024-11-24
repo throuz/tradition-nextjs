@@ -80,10 +80,10 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
       ),
     })
     .superRefine((values, ctx) => {
-      const { orderSide, entryPrice } = position;
+      const { side, entryPrice } = position;
       const { takeProfitPrice, stopLossPrice } = values;
       if (takeProfitPrice || stopLossPrice) {
-        if (orderSide === OrderSide.Buy) {
+        if (side === OrderSide.Buy) {
           if (takeProfitPrice && takeProfitPrice <= entryPrice) {
             ctx.addIssue({
               code: ZodIssueCode.custom,
@@ -99,7 +99,7 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
             });
           }
         }
-        if (orderSide === OrderSide.Sell) {
+        if (side === OrderSide.Sell) {
           if (takeProfitPrice && takeProfitPrice >= entryPrice) {
             ctx.addIssue({
               code: ZodIssueCode.custom,

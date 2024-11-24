@@ -7,7 +7,7 @@ import { z, ZodIssueCode } from "zod";
 
 import { fetchTicker } from "@/lib/api/ticker";
 import { useGlobalStore } from "@/lib/hooks/use-global-store";
-import { OrderSide } from "@/lib/types";
+import { OrderSide, Position } from "@/lib/types";
 import { calculateLiqPrice } from "@/lib/utils";
 
 import { useAvailableBalance } from "../../../../lib/hooks/use-available-balance";
@@ -154,18 +154,26 @@ const usePlaceOrderForm = () => {
         const tickerResponse = await fetchTicker(symbol ?? "");
         const entryPrice = Number(tickerResponse.price);
         const size = (amount * leverage) / entryPrice;
-        const liqPrice = calculateLiqPrice({ orderSide, leverage, entryPrice });
-        openPosition({
+        const liquidationPrice = calculateLiqPrice({
+          orderSide,
+          leverage,
+          entryPrice,
+        });
+        const position: Position = {
           id: id,
-          orderSide: orderSide,
-          fundingAmount: amount,
+          accountId: "demo",
+          side: orderSide,
           symbol: symbol as string,
-          size: size,
+          positionSize: size,
           entryPrice: entryPrice,
-          liqPrice: liqPrice as number,
+          leverage: leverage,
+          initialMargin: amount,
+          liquidationPrice: liquidationPrice as number,
           takeProfitPrice: takeProfitPrice,
           stopLossPrice: stopLossPrice,
-        });
+          createdAt: Date.now(),
+        };
+        openPosition(position);
         decreaseAvailableBalance(amount);
         toast.success(`Order placed: ${JSON.stringify(values)}`);
         form.reset();

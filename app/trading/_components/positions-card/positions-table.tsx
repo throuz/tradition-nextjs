@@ -40,12 +40,11 @@ export function PositionsTable() {
         {positions.map((position) => {
           const {
             id,
-            orderSide,
-            fundingAmount,
+            side,
             symbol,
-            size,
+            positionSize,
             entryPrice,
-            liqPrice,
+            liquidationPrice,
             takeProfitPrice,
             stopLossPrice,
           } = position;
@@ -59,9 +58,9 @@ export function PositionsTable() {
           const lastPrice = entryPrice * (1 + (Math.random() * 0.02 - 0.01));
           const pnl =
             (lastPrice - entryPrice) *
-            size *
-            (orderSide === OrderSide.Buy ? 1 : -1);
-          const roi = (pnl / fundingAmount) * 100;
+            positionSize *
+            (side === OrderSide.Buy ? 1 : -1);
+          const roi = (pnl / positionSize) * 100;
           const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(
             2
           )}`;
@@ -78,14 +77,14 @@ export function PositionsTable() {
               <TableCell
                 className={cn(
                   "text-center",
-                  orderSide === OrderSide.Buy && "text-green-500",
-                  orderSide === OrderSide.Sell && "text-red-500"
+                  side === OrderSide.Buy && "text-green-500",
+                  side === OrderSide.Sell && "text-red-500"
                 )}
               >
-                {orderSideMap[orderSide]}
+                {orderSideMap[side]}
               </TableCell>
               <TableCell className="text-center">
-                {size.toLocaleString(undefined, {
+                {positionSize.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                 })}{" "}
                 {symbol.replace(/USDT$/, "")}
@@ -105,7 +104,7 @@ export function PositionsTable() {
                 {pnlroi}
               </TableCell>
               <TableCell className="text-center">
-                ${liqPrice.toLocaleString()}
+                ${liquidationPrice.toLocaleString()}
               </TableCell>
               <TableCell className="text-center">
                 {takeProfitPrice ? `$${takeProfitPrice.toLocaleString()}` : "-"}
