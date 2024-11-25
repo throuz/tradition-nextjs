@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { fetchTicker } from "@/lib/api/ticker";
 import { useGlobalStore } from "@/lib/hooks/use-global-store";
-import { OrderSide, Position } from "@/lib/types";
+import { Position } from "@/lib/types";
+import { calculatePnl } from "@/lib/utils";
 
 const CloseButton = ({ position }: { position: Position }) => {
   const { closePosition, updateBalance } = useGlobalStore();
@@ -14,10 +15,12 @@ const CloseButton = ({ position }: { position: Position }) => {
     try {
       const tickerResponse = await fetchTicker(position.symbol);
       const lastPrice = Number(tickerResponse.price);
-      const pnl =
-        (lastPrice - position.entryPrice) *
-        position.size *
-        (position.side === OrderSide.Buy ? 1 : -1);
+      const pnl = calculatePnl({
+        lastPrice,
+        entryPrice: position.entryPrice,
+        size: position.size,
+        side: position.side,
+      });
       updateBalance(pnl);
       closePosition(position.id);
       toast.success("Close position success");

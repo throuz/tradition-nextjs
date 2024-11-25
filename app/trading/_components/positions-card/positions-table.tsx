@@ -14,7 +14,7 @@ import {
 import { useGlobalStore } from "@/lib/hooks/use-global-store";
 import { useTickerStream } from "@/lib/streams/use-ticker-stream";
 import { OrderSide, Position } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { calculatePnl, cn } from "@/lib/utils";
 
 import CloseButton from "./close-button";
 import TPSLButton from "./tpsl-button";
@@ -33,10 +33,12 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
     return "-";
   }
   const lastPrice = Number(tickerStream.c);
-  const pnl =
-    (lastPrice - position.entryPrice) *
-    position.size *
-    (position.side === OrderSide.Buy ? 1 : -1);
+  const pnl = calculatePnl({
+    lastPrice,
+    entryPrice: position.entryPrice,
+    size: position.size,
+    side: position.side,
+  });
   const roi = (pnl / position.initialMargin) * 100;
   const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(2)}`;
   const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi).toFixed(2)}%`;
