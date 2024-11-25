@@ -14,9 +14,8 @@ const CloseButton = ({ position }: { position: Position }) => {
   const onClose = async () => {
     try {
       const tickerResponse = await fetchTicker(position.symbol);
-      const lastPrice = Number(tickerResponse.price);
       const pnl = calculatePnl({
-        lastPrice,
+        lastPrice: Number(tickerResponse.price),
         entryPrice: position.entryPrice,
         size: position.size,
         side: position.side,

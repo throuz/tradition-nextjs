@@ -32,9 +32,8 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
   if (tickerStream === null) {
     return "-";
   }
-  const lastPrice = Number(tickerStream.c);
   const pnl = calculatePnl({
-    lastPrice,
+    lastPrice: Number(tickerStream.c),
     entryPrice: position.entryPrice,
     size: position.size,
     side: position.side,
