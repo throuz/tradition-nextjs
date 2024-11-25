@@ -141,8 +141,17 @@ const usePlaceOrderForm = () => {
       }
     });
 
+  const defaultValues = {
+    orderSide: "",
+    leverage: "",
+    amount: "",
+    takeProfitPrice: "",
+    stopLossPrice: "",
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: defaultValues as unknown as z.infer<typeof formSchema>,
   });
 
   const onSubmit = form.handleSubmit(
