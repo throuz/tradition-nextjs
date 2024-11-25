@@ -1,6 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { ReactNode } from "react";
+
 import {
   Table,
   TableBody,
@@ -11,126 +12,159 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGlobalStore } from "@/lib/hooks/use-global-store";
-import { OrderSide } from "@/lib/types";
+import { useTickerStream } from "@/lib/streams/use-ticker-stream";
+import { OrderSide, Position } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import CloseButton from "./close-button";
 import TPSLButton from "./tpsl-button";
 
+const LastPriceCell = ({ symbol }: { symbol: string }) => {
+  const tickerStream = useTickerStream(symbol);
+  if (tickerStream) {
+    return `$${tickerStream.c.toLocaleString()}`;
+  }
+  return "-";
+};
+
+const PnlRoiCell = ({ position }: { position: Position }) => {
+  const tickerStream = useTickerStream(position.symbol);
+  if (tickerStream === null) {
+    return "-";
+  }
+  const lastPrice = Number(tickerStream.c);
+  const pnl =
+    (lastPrice - position.entryPrice) *
+    position.size *
+    (position.side === OrderSide.Buy ? 1 : -1);
+  const roi = (pnl / position.initialMargin) * 100;
+  const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(2)}`;
+  const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi).toFixed(2)}%`;
+  return (
+    <div
+      className={cn(pnl > 0 ? "text-green-500" : "text-red-500")}
+    >{`${formattedPnl} (${formattedRoi})`}</div>
+  );
+};
+
+interface Column {
+  head: string;
+  cell: (rowData: Position) => ReactNode;
+}
+
+const columns: Column[] = [
+  {
+    head: "Symbol",
+    cell: (rowData) => rowData.symbol,
+  },
+  {
+    head: "Side",
+    cell: (rowData) => {
+      const orderSideMap: Record<OrderSide, string> = {
+        [OrderSide.Buy]: "Buy",
+        [OrderSide.Sell]: "Sell",
+      };
+      return (
+        <div
+          className={cn(
+            rowData.side === OrderSide.Buy && "text-green-500",
+            rowData.side === OrderSide.Sell && "text-red-500"
+          )}
+        >
+          {orderSideMap[rowData.side]}
+        </div>
+      );
+    },
+  },
+  {
+    head: "Size",
+    cell: (rowData) => {
+      const formatedSize = rowData.size.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+      });
+      const formatedSymbol = rowData.symbol.replace(/USDT$/, "");
+      return `${formatedSize} ${formatedSymbol}`;
+    },
+  },
+  {
+    head: "Entry Price",
+    cell: (rowData) => `$${rowData.entryPrice.toLocaleString()}`,
+  },
+  {
+    head: "Last Price",
+    cell: (rowData) => <LastPriceCell symbol={rowData.symbol} />,
+  },
+  {
+    head: "PNL (ROI %)",
+    cell: (rowData) => <PnlRoiCell position={rowData} />,
+  },
+  {
+    head: "Leverage",
+    cell: (rowData) => rowData.leverage,
+  },
+  {
+    head: "Initial Margin",
+    cell: (rowData) => `$${rowData.initialMargin.toLocaleString()}`,
+  },
+  {
+    head: "Liq. Price",
+    cell: (rowData) => `$${rowData.liquidationPrice.toLocaleString()}`,
+  },
+  {
+    head: "Take Profit",
+    cell: (rowData) =>
+      rowData.takeProfitPrice
+        ? `$${rowData.takeProfitPrice.toLocaleString()}`
+        : "-",
+  },
+  {
+    head: "Stop Loss",
+    cell: (rowData) =>
+      rowData.stopLossPrice
+        ? `$${rowData.stopLossPrice.toLocaleString()}`
+        : "-",
+  },
+  {
+    head: "Created At",
+    cell: (rowData) => new Date(rowData.createdAt).toLocaleString(),
+  },
+  {
+    head: "Actions",
+    cell: (rowData) => (
+      <div className="flex gap-2 justify-center">
+        <TPSLButton position={rowData} />
+        <CloseButton id={rowData.id} />
+      </div>
+    ),
+  },
+];
+
 const PositionsTable = () => {
   const { positions } = useGlobalStore();
+
+  const heads = columns.map((column, i) => (
+    <TableHead key={i} className="text-center">
+      {column.head}
+    </TableHead>
+  ));
+
+  const cells = (position: Position) =>
+    columns.map((column, i) => (
+      <TableCell key={i} className="text-center">
+        {column.cell(position)}
+      </TableCell>
+    ));
 
   return (
     <Table>
       <TableCaption>Your open trading positions.</TableCaption>
       <TableHeader>
-        <TableRow>
-          <TableHead className="text-center">Symbol</TableHead>
-          <TableHead className="text-center">Side</TableHead>
-          <TableHead className="text-center">Size</TableHead>
-          <TableHead className="text-center">Entry Price</TableHead>
-          <TableHead className="text-center">Last Price</TableHead>
-          <TableHead className="text-center">PNL (ROI %)</TableHead>
-          <TableHead className="text-center">Leverage</TableHead>
-          <TableHead className="text-center">Initial Margin</TableHead>
-          <TableHead className="text-center">Liq. Price</TableHead>
-          <TableHead className="text-center">Take Profit</TableHead>
-          <TableHead className="text-center">Stop Loss</TableHead>
-          <TableHead className="text-center">Created At</TableHead>
-          <TableHead className="text-center">Actions</TableHead>
-        </TableRow>
+        <TableRow>{heads}</TableRow>
       </TableHeader>
       <TableBody>
-        {positions.map((position) => {
-          const {
-            id,
-            side,
-            symbol,
-            size,
-            entryPrice,
-            liquidationPrice,
-            takeProfitPrice,
-            stopLossPrice,
-            leverage,
-            initialMargin,
-            createdAt,
-          } = position;
-
-          const orderSideMap: Record<OrderSide, string> = {
-            [OrderSide.Buy]: "Buy",
-            [OrderSide.Sell]: "Sell",
-          };
-
-          // Placeholder for last price (replace with real data source)
-          const lastPrice = entryPrice * (1 + (Math.random() * 0.02 - 0.01));
-          const pnl =
-            (lastPrice - entryPrice) * size * (side === OrderSide.Buy ? 1 : -1);
-          const roi = (pnl / initialMargin) * 100; // Using initialMargin for ROI calculation
-          const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(
-            2
-          )}`;
-          const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi).toFixed(
-            2
-          )}%`;
-          const pnlroi = `${formattedPnl} (${formattedRoi})`;
-
-          return (
-            <TableRow key={id}>
-              <TableCell className="font-medium text-center">
-                {symbol}
-              </TableCell>
-              <TableCell
-                className={cn(
-                  "text-center",
-                  side === OrderSide.Buy && "text-green-500",
-                  side === OrderSide.Sell && "text-red-500"
-                )}
-              >
-                {orderSideMap[side]}
-              </TableCell>
-              <TableCell className="text-center">
-                {size.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                })}{" "}
-                {symbol.replace(/USDT$/, "")}
-              </TableCell>
-              <TableCell className="text-center">
-                ${entryPrice.toLocaleString()}
-              </TableCell>
-              <TableCell className="text-center">
-                ${lastPrice.toLocaleString()}
-              </TableCell>
-              <TableCell
-                className={cn(
-                  "text-center",
-                  pnl >= 0 ? "text-green-500" : "text-red-500"
-                )}
-              >
-                {pnlroi}
-              </TableCell>
-              <TableCell className="text-center">{leverage}</TableCell>
-              <TableCell className="text-center">
-                ${initialMargin.toLocaleString()}
-              </TableCell>
-              <TableCell className="text-center">
-                ${liquidationPrice.toLocaleString()}
-              </TableCell>
-              <TableCell className="text-center">
-                {takeProfitPrice ? `$${takeProfitPrice.toLocaleString()}` : "-"}
-              </TableCell>
-              <TableCell className="text-center">
-                {stopLossPrice ? `$${stopLossPrice.toLocaleString()}` : "-"}
-              </TableCell>
-              <TableCell className="text-center">
-                {new Date(createdAt).toLocaleString()}
-              </TableCell>
-              <TableCell className="flex gap-2 justify-center">
-                <TPSLButton position={position} />
-                <CloseButton id={id} />
-              </TableCell>
-            </TableRow>
-          );
-        })}
+        {positions.map((position) => (
+          <TableRow key={position.id}>{cells(position)}</TableRow>
+        ))}
       </TableBody>
     </Table>
   );
