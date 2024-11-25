@@ -188,7 +188,7 @@ export interface Position {
   accountId: string;
   side: OrderSide;
   symbol: string;
-  positionSize: number;
+  size: number;
   entryPrice: number;
   leverage: number;
   initialMargin: number;

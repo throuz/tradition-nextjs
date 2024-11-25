@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 import TPSLButton from "./tpsl-button";
 
-export function PositionsTable() {
+const PositionsTable = () => {
   const { positions } = useGlobalStore();
 
   return (
@@ -45,7 +45,7 @@ export function PositionsTable() {
             id,
             side,
             symbol,
-            positionSize,
+            size,
             entryPrice,
             liquidationPrice,
             takeProfitPrice,
@@ -63,9 +63,7 @@ export function PositionsTable() {
           // Placeholder for last price (replace with real data source)
           const lastPrice = entryPrice * (1 + (Math.random() * 0.02 - 0.01));
           const pnl =
-            (lastPrice - entryPrice) *
-            positionSize *
-            (side === OrderSide.Buy ? 1 : -1);
+            (lastPrice - entryPrice) * size * (side === OrderSide.Buy ? 1 : -1);
           const roi = (pnl / initialMargin) * 100; // Using initialMargin for ROI calculation
           const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(
             2
@@ -90,7 +88,7 @@ export function PositionsTable() {
                 {orderSideMap[side]}
               </TableCell>
               <TableCell className="text-center">
-                {positionSize.toLocaleString(undefined, {
+                {size.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                 })}{" "}
                 {symbol.replace(/USDT$/, "")}
@@ -137,4 +135,6 @@ export function PositionsTable() {
       </TableBody>
     </Table>
   );
-}
+};
+
+export default PositionsTable;

@@ -164,7 +164,7 @@ const usePlaceOrderForm = () => {
           accountId: "demo",
           side: orderSide,
           symbol: symbol as string,
-          positionSize: size,
+          size: size,
           entryPrice: entryPrice,
           leverage: leverage,
           initialMargin: amount,

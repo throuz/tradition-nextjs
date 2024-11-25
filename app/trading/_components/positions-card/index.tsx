@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchExchangeInfo } from "@/lib/api/exchange-info";
 
 import { PositionsCardProvider } from "./context";
-import { PositionsTable } from "./positions-table";
+import PositionsTable from "./positions-table";
 
 export default async function PositionsCard() {
   const exchangeInfoResponse = await fetchExchangeInfo();
