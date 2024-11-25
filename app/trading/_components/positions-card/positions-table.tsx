@@ -14,6 +14,7 @@ import { useGlobalStore } from "@/lib/hooks/use-global-store";
 import { OrderSide } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import CloseButton from "./close-button";
 import TPSLButton from "./tpsl-button";
 
 const PositionsTable = () => {
@@ -125,9 +126,7 @@ const PositionsTable = () => {
               </TableCell>
               <TableCell className="flex gap-2 justify-center">
                 <TPSLButton position={position} />
-                <Button variant="destructive" className="bg-red-700">
-                  Close
-                </Button>
+                <CloseButton id={id} />
               </TableCell>
             </TableRow>
           );
