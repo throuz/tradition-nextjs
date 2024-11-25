@@ -19,7 +19,7 @@ const usePlaceOrderForm = () => {
   const availableBalance = useAvailableBalance();
   const priceDecimalDigits = usePriceDecimalDigits();
   const searchParams = useSearchParams();
-  const symbol = searchParams.get("symbol");
+  const symbol = searchParams.get("symbol") as string;
 
   const formSchema = z
     .object({
@@ -88,7 +88,7 @@ const usePlaceOrderForm = () => {
       const { orderSide, takeProfitPrice, stopLossPrice } = values;
       try {
         if (takeProfitPrice || stopLossPrice) {
-          const tickerResponse = await fetchTicker(symbol ?? "");
+          const tickerResponse = await fetchTicker(symbol);
           const latestPrice = Number(tickerResponse.price);
           if (orderSide === OrderSide.Buy) {
             if (takeProfitPrice && takeProfitPrice <= latestPrice) {
@@ -160,7 +160,7 @@ const usePlaceOrderForm = () => {
         const id = nanoid();
         const { orderSide, leverage, amount, takeProfitPrice, stopLossPrice } =
           values;
-        const tickerResponse = await fetchTicker(symbol ?? "");
+        const tickerResponse = await fetchTicker(symbol);
         const entryPrice = Number(tickerResponse.price);
         const size = (amount * leverage) / entryPrice;
         const liquidationPrice = calculateLiqPrice({
@@ -172,12 +172,12 @@ const usePlaceOrderForm = () => {
           id: id,
           accountId: "demo",
           side: orderSide,
-          symbol: symbol as string,
+          symbol: symbol,
           size: size,
           entryPrice: entryPrice,
           leverage: leverage,
           initialMargin: amount,
-          liquidationPrice: liquidationPrice as number,
+          liquidationPrice: liquidationPrice,
           takeProfitPrice: takeProfitPrice,
           stopLossPrice: stopLossPrice,
           createdAt: Date.now(),

@@ -29,13 +29,10 @@ export const calculateLiqPrice = ({
   orderSide: OrderSide;
   leverage: number;
   entryPrice: number;
-}): number | null => {
-  if (orderSide === OrderSide.Buy) {
-    return entryPrice * (1 - 1 / leverage);
-  } else if (orderSide === OrderSide.Sell) {
-    return entryPrice * (1 + 1 / leverage);
-  }
-  return null;
+}): number => {
+  return orderSide === OrderSide.Buy
+    ? entryPrice * (1 - 1 / leverage)
+    : entryPrice * (1 + 1 / leverage);
 };
 
 export const calculatePnl = ({
@@ -49,5 +46,7 @@ export const calculatePnl = ({
   size: number;
   side: OrderSide;
 }): number => {
-  return (lastPrice - entryPrice) * size * (side === OrderSide.Buy ? 1 : -1);
+  return side === OrderSide.Buy
+    ? (lastPrice - entryPrice) * size
+    : (lastPrice - entryPrice) * size * -1;
 };
