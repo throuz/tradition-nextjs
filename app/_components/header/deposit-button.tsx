@@ -19,7 +19,7 @@ import { useGlobalStore } from "@/lib/hooks/use-global-store";
 import { TradingMode } from "@/lib/types";
 
 export function DepositButton() {
-  const { tradingMode, increaseAvailableBalance } = useGlobalStore();
+  const { tradingMode, updateBalance } = useGlobalStore();
   const [open, setOpen] = useState(false);
   const [depositAmount, setDepositAmount] = useState("");
 
@@ -34,7 +34,7 @@ export function DepositButton() {
 
     // Demo and Real Mode Handling
     if (tradingMode === TradingMode.Demo) {
-      increaseAvailableBalance(amount);
+      updateBalance(amount);
       console.log(`Demo mode deposit: ${amount}`);
     } else if (tradingMode === TradingMode.Real) {
       console.log(`Real mode deposit: ${amount}`);

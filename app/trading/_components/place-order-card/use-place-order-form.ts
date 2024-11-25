@@ -15,7 +15,7 @@ import { useAvailableBalance } from "../../../../lib/hooks/use-available-balance
 import { usePriceDecimalDigits } from "./use-price-decimal-digits";
 
 const usePlaceOrderForm = () => {
-  const { decreaseAvailableBalance, openPosition } = useGlobalStore();
+  const { updateBalance, openPosition } = useGlobalStore();
   const availableBalance = useAvailableBalance();
   const priceDecimalDigits = usePriceDecimalDigits();
   const searchParams = useSearchParams();
@@ -183,7 +183,7 @@ const usePlaceOrderForm = () => {
           createdAt: Date.now(),
         };
         openPosition(position);
-        decreaseAvailableBalance(amount);
+        updateBalance(-amount);
         toast.success(`Order placed: ${JSON.stringify(values)}`);
         form.reset();
       } catch (error) {

@@ -20,7 +20,7 @@ import { useGlobalStore } from "@/lib/hooks/use-global-store";
 import { TradingMode } from "@/lib/types";
 
 export function WithdrawButton() {
-  const { tradingMode, decreaseAvailableBalance } = useGlobalStore();
+  const { tradingMode, updateBalance } = useGlobalStore();
   const [open, setOpen] = useState(false);
   const availableBalance = useAvailableBalance();
 
@@ -40,7 +40,7 @@ export function WithdrawButton() {
     }
 
     if (tradingMode === TradingMode.Demo) {
-      decreaseAvailableBalance(amount);
+      updateBalance(-amount);
       console.log(tradingMode);
     } else if (tradingMode === TradingMode.Real) {
       console.log(tradingMode);

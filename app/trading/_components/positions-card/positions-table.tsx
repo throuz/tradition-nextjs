@@ -133,7 +133,7 @@ const columns: Column[] = [
     cell: (rowData) => (
       <div className="flex gap-2 justify-center">
         <TPSLButton position={rowData} />
-        <CloseButton id={rowData.id} />
+        <CloseButton position={rowData} />
       </div>
     ),
   },

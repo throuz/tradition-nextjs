@@ -5,8 +5,7 @@ import { Position, TradingMode } from "../types";
 
 export type GlobalStore = {
   availableBalance: number;
-  increaseAvailableBalance: (increaseAmount: number) => void;
-  decreaseAvailableBalance: (decreaseAmount: number) => void;
+  updateBalance: (amount: number) => void;
   positions: Position[];
   openPosition: (position: Position) => void;
   closePosition: (id: string) => void;
@@ -17,43 +16,29 @@ export type GlobalStore = {
 
 export const useGlobalStore = create<GlobalStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       availableBalance: 0,
-      increaseAvailableBalance: (increaseAmount) => {
-        const { availableBalance } = get();
-        set({ availableBalance: availableBalance + increaseAmount });
-      },
-      decreaseAvailableBalance: (decreaseAmount) => {
-        const { availableBalance } = get();
-        set({ availableBalance: availableBalance - decreaseAmount });
-      },
+      updateBalance: (amount: number) =>
+        set((state) => ({
+          availableBalance: state.availableBalance + amount,
+        })),
       positions: [],
-      openPosition: (position) => {
-        const { positions } = get();
-        set({ positions: [...positions, position] });
-      },
-      closePosition: (id) => {
-        const { positions } = get();
-        set({
-          positions: positions.filter((position) => position.id !== id),
-        });
-      },
-      updatePosition: (id, updates) => {
-        const { positions } = get();
-        const positionIndex = positions.findIndex(
-          (position) => position.id === id
-        );
-        if (positionIndex === -1) {
-          console.error(`Position with id ${id} not found`);
-          return;
-        }
-        const updatedPositions = positions.map((position) =>
-          position.id === id ? { ...position, ...updates } : position
-        );
-        set({ positions: updatedPositions });
-      },
+      openPosition: (position: Position) =>
+        set((state) => ({
+          positions: [...state.positions, position],
+        })),
+      closePosition: (id: string) =>
+        set((state) => ({
+          positions: state.positions.filter((position) => position.id !== id),
+        })),
+      updatePosition: (id: string, updates: Partial<Position>) =>
+        set((state) => ({
+          positions: state.positions.map((position) =>
+            position.id === id ? { ...position, ...updates } : position
+          ),
+        })),
       tradingMode: TradingMode.Demo,
-      setTradingMode: (tradingMode) => set({ tradingMode }),
+      setTradingMode: (tradingMode: TradingMode) => set({ tradingMode }),
     }),
     {
       name: "global-storage",
