@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { z, ZodIssueCode } from "zod";
 
 import { fetchTicker } from "@/lib/api/ticker";
-import { useGlobalStore } from "@/lib/hooks/use-global-store";
+import useGlobalStore from "@/lib/hooks/use-global-store";
 import { OrderSide, Position } from "@/lib/types";
 import { calculateLiqPrice } from "@/lib/utils";
 

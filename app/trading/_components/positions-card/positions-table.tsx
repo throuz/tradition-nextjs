@@ -11,8 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGlobalStore } from "@/lib/hooks/use-global-store";
-import { useTickerStream } from "@/lib/streams/use-ticker-stream";
+import useGlobalStore from "@/lib/hooks/use-global-store";
+import useTickerStream from "@/lib/streams/use-ticker-stream";
 import { OrderSide, Position } from "@/lib/types";
 import { calculatePnl, cn } from "@/lib/utils";
 

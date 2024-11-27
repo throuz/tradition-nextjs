@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { useTickerStream } from "../../../../lib/streams/use-ticker-stream";
+import useTickerStream from "../../../../lib/streams/use-ticker-stream";
 
 import { useSymbolDataCardContext } from "./context";
 import { SymbolCombobox } from "./symbol-combobox";

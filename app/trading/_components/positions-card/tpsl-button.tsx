@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { fetchTicker } from "@/lib/api/ticker";
-import { useGlobalStore } from "@/lib/hooks/use-global-store";
+import useGlobalStore from "@/lib/hooks/use-global-store";
 import { OrderSide, Position } from "@/lib/types";
 
 import usePriceDecimalDigits from "./use-price-decimal-digits";

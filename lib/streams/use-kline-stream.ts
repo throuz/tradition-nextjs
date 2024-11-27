@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import { KlineInterval } from "@/lib/types";
 
+import useWebSocketStore from "../hooks/use-websocket-store";
+
 export interface KlineStream {
   e: string; // Event type
   E: number; // Event time
@@ -33,25 +35,42 @@ const useKlineStream = (
 ) => {
   const [data, setData] = useState<KlineStream | null>(null);
 
+  const connect = useWebSocketStore((state) => state.connect);
+  const disconnect = useWebSocketStore((state) => state.disconnect);
+  const messages = useWebSocketStore((state) => state.messages);
+
+  const url =
+    symbol && interval
+      ? `wss://fstream.binance.com/ws/${symbol.toLowerCase()}@kline_${interval}`
+      : null;
+
   useEffect(() => {
-    if (!symbol || !interval) {
-      return;
+    if (url) {
+      connect(url);
     }
 
-    const socket = new WebSocket(
-      `wss://fstream.binance.com/ws/${symbol.toLowerCase()}@kline_${interval}`
-    );
-
-    socket.onmessage = (event) => {
-      const parsedData: KlineStream = JSON.parse(event.data);
-      setData(parsedData);
-    };
-
     return () => {
-      setData(null);
-      socket.close();
+      if (url) {
+        disconnect(url);
+      }
     };
-  }, [symbol, interval]);
+  }, [url, connect, disconnect]);
+
+  useEffect(() => {
+    if (url && messages.has(url)) {
+      const allMessages = messages.get(url) || [];
+      const latestMessage = allMessages[allMessages.length - 1];
+
+      if (latestMessage) {
+        try {
+          const parsedData: KlineStream = JSON.parse(latestMessage);
+          setData(parsedData);
+        } catch (e) {
+          console.error("Failed to parse WebSocket message", e);
+        }
+      }
+    }
+  }, [messages, url]);
 
   return data;
 };

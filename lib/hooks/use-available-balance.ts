@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useGlobalStore } from "@/lib/hooks/use-global-store";
+import useGlobalStore from "@/lib/hooks/use-global-store";
 import { TradingMode } from "@/lib/types";
 
 export function useAvailableBalance() {

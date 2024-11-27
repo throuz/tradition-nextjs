@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { fetchTicker } from "@/lib/api/ticker";
-import { useGlobalStore } from "@/lib/hooks/use-global-store";
+import useGlobalStore from "@/lib/hooks/use-global-store";
 import { Position } from "@/lib/types";
 import { calculatePnl } from "@/lib/utils";
 

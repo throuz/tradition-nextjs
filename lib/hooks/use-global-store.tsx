@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 import { Position, TradingMode } from "../types";
 
-export type GlobalStore = {
+interface GlobalStore {
   availableBalance: number;
   updateBalance: (amount: number) => void;
   positions: Position[];
@@ -12,9 +12,9 @@ export type GlobalStore = {
   updatePosition: (id: string, updates: Partial<Position>) => void;
   tradingMode: TradingMode;
   setTradingMode: (tradingMode: TradingMode) => void;
-};
+}
 
-export const useGlobalStore = create<GlobalStore>()(
+const useGlobalStore = create<GlobalStore>()(
   persist(
     (set) => ({
       availableBalance: 0,
@@ -45,3 +45,5 @@ export const useGlobalStore = create<GlobalStore>()(
     }
   )
 );
+
+export default useGlobalStore;
