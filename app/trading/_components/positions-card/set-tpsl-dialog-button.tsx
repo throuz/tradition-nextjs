@@ -25,19 +25,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { fetchTicker } from "@/lib/api/ticker";
 import useGlobalStore from "@/lib/hooks/use-global-store";
 import { OrderSide, Position } from "@/lib/types";
 import { calculateLiqPrice } from "@/lib/utils";
 
 import usePriceDecimalDigits from "./use-price-decimal-digits";
 
-interface TPSLButtonProps {
+interface SetTPSLDialogButtonProps {
   position: Position;
 }
 
-const TPSLButton = ({ position }: TPSLButtonProps) => {
-  const [open, setOpen] = useState(false);
+const SetTPSLDialogButton = ({ position }: SetTPSLDialogButtonProps) => {
+  const [isDialogOpen, setDialogOpen] = useState(false);
   const { updatePosition } = useGlobalStore();
   const priceDecimalDigits = usePriceDecimalDigits(position.symbol);
 
@@ -155,7 +154,7 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
       try {
         updatePosition(position.id, values);
         toast.success(`TP/SL updated: ${JSON.stringify(values)}`);
-        setOpen(false);
+        setDialogOpen(false);
       } catch (error) {
         toast.error((error as Error).message);
       }
@@ -163,7 +162,7 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Set TP/SL</Button>
       </DialogTrigger>
@@ -235,4 +234,4 @@ const TPSLButton = ({ position }: TPSLButtonProps) => {
   );
 };
 
-export default TPSLButton;
+export default SetTPSLDialogButton;

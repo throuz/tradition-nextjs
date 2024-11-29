@@ -8,10 +8,10 @@ import useGlobalStore from "@/lib/hooks/use-global-store";
 import { Position } from "@/lib/types";
 import { calculatePnl } from "@/lib/utils";
 
-const CloseButton = ({ position }: { position: Position }) => {
+const ClosePositionButton = ({ position }: { position: Position }) => {
   const { closePosition, updateBalance } = useGlobalStore();
 
-  const onClose = async () => {
+  const handleClosePosition = async () => {
     try {
       const tickerResponse = await fetchTicker(position.symbol);
       const pnl = calculatePnl({
@@ -22,17 +22,21 @@ const CloseButton = ({ position }: { position: Position }) => {
       });
       updateBalance(pnl);
       closePosition(position.id);
-      toast.success("Close position success");
+      toast.success("Position closed successfully");
     } catch (error) {
       toast.error((error as Error).message);
     }
   };
 
   return (
-    <Button variant="destructive" className="bg-red-700" onClick={onClose}>
+    <Button
+      variant="destructive"
+      className="bg-red-700"
+      onClick={handleClosePosition}
+    >
       Close
     </Button>
   );
 };
 
-export default CloseButton;
+export default ClosePositionButton;

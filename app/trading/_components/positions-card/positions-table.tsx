@@ -16,8 +16,8 @@ import useTickerStream from "@/lib/streams/use-ticker-stream";
 import { OrderSide, Position } from "@/lib/types";
 import { calculatePnl, cn } from "@/lib/utils";
 
-import CloseButton from "./close-button";
-import TPSLButton from "./tpsl-button";
+import ClosePositionButton from "./close-position-button";
+import SetTPSLDialogButton from "./set-tpsl-dialog-button";
 
 const LastPriceCell = ({ symbol }: { symbol: string }) => {
   const tickerStream = useTickerStream(symbol);
@@ -133,8 +133,8 @@ const columns: Column[] = [
     head: "Actions",
     cell: (rowData) => (
       <div className="flex gap-2 justify-center">
-        <TPSLButton position={rowData} />
-        <CloseButton position={rowData} />
+        <SetTPSLDialogButton position={rowData} />
+        <ClosePositionButton position={rowData} />
       </div>
     ),
   },
