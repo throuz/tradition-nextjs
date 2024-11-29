@@ -85,11 +85,16 @@ const usePlaceOrderForm = () => {
       ),
     })
     .superRefine(async (values, ctx) => {
-      const { orderSide, takeProfitPrice, stopLossPrice } = values;
+      const { orderSide, leverage, takeProfitPrice, stopLossPrice } = values;
       try {
         if (takeProfitPrice || stopLossPrice) {
           const tickerResponse = await fetchTicker(symbol);
           const latestPrice = Number(tickerResponse.price);
+          const liquidationPrice = calculateLiqPrice({
+            orderSide,
+            leverage,
+            entryPrice: latestPrice,
+          });
           if (orderSide === OrderSide.Buy) {
             if (takeProfitPrice && takeProfitPrice <= latestPrice) {
               ctx.addIssue({
@@ -103,6 +108,13 @@ const usePlaceOrderForm = () => {
                 code: ZodIssueCode.custom,
                 path: ["stopLossPrice"],
                 message: `Stop Loss Price must be less than ${latestPrice}`,
+              });
+            }
+            if (stopLossPrice && stopLossPrice <= liquidationPrice) {
+              ctx.addIssue({
+                code: ZodIssueCode.custom,
+                path: ["stopLossPrice"],
+                message: `Stop Loss Price must be greater than ${liquidationPrice}`,
               });
             }
           }
@@ -119,6 +131,13 @@ const usePlaceOrderForm = () => {
                 code: ZodIssueCode.custom,
                 path: ["stopLossPrice"],
                 message: `Stop Loss Price must be greater than ${latestPrice}`,
+              });
+            }
+            if (stopLossPrice && stopLossPrice >= liquidationPrice) {
+              ctx.addIssue({
+                code: ZodIssueCode.custom,
+                path: ["stopLossPrice"],
+                message: `Stop Loss Price must be less than ${liquidationPrice}`,
               });
             }
           }
