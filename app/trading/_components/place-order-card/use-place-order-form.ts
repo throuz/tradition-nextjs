@@ -114,7 +114,9 @@ const usePlaceOrderForm = () => {
               ctx.addIssue({
                 code: ZodIssueCode.custom,
                 path: ["stopLossPrice"],
-                message: `Stop Loss Price must be greater than ${liquidationPrice}`,
+                message: `Stop Loss Price must be greater than ${liquidationPrice.toFixed(
+                  priceDecimalDigits
+                )}`,
               });
             }
           }
@@ -137,7 +139,9 @@ const usePlaceOrderForm = () => {
               ctx.addIssue({
                 code: ZodIssueCode.custom,
                 path: ["stopLossPrice"],
-                message: `Stop Loss Price must be less than ${liquidationPrice}`,
+                message: `Stop Loss Price must be less than ${liquidationPrice.toFixed(
+                  priceDecimalDigits
+                )}`,
               });
             }
           }
