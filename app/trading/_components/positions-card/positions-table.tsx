@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 import {
   Table,
@@ -29,9 +29,45 @@ const LastPriceCell = ({ symbol }: { symbol: string }) => {
 
 const PnlRoiCell = ({ position }: { position: Position }) => {
   const tickerStream = useTickerStream(position.symbol);
-  if (tickerStream === null) {
+  const { closePosition } = useGlobalStore();
+
+  useEffect(() => {
+    if (!tickerStream) return;
+    const lastPrice = Number(tickerStream.c);
+    const isTriggered = (() => {
+      if (position.side === OrderSide.Buy) {
+        return (
+          (position.takeProfitPrice && lastPrice >= position.takeProfitPrice) ||
+          (position.stopLossPrice && lastPrice <= position.stopLossPrice) ||
+          lastPrice <= position.liquidationPrice
+        );
+      }
+      if (position.side === OrderSide.Sell) {
+        return (
+          (position.takeProfitPrice && lastPrice <= position.takeProfitPrice) ||
+          (position.stopLossPrice && lastPrice >= position.stopLossPrice) ||
+          lastPrice >= position.liquidationPrice
+        );
+      }
+      return false;
+    })();
+    if (isTriggered) {
+      closePosition(position.id);
+    }
+  }, [
+    closePosition,
+    position.id,
+    position.liquidationPrice,
+    position.side,
+    position.stopLossPrice,
+    position.takeProfitPrice,
+    tickerStream,
+  ]);
+
+  if (!tickerStream) {
     return "-";
   }
+
   const pnl = calculatePnl({
     lastPrice: Number(tickerStream.c),
     entryPrice: position.entryPrice,
@@ -41,6 +77,7 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
   const roi = (pnl / position.initialMargin) * 100;
   const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(2)}`;
   const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi).toFixed(2)}%`;
+
   return (
     <div
       className={cn(pnl > 0 ? "text-green-500" : "text-red-500")}
