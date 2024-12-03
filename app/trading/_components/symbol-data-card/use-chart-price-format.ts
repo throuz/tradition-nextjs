@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { DeepPartial } from "react-hook-form";
 import { PriceFormat } from "lightweight-charts";
 import { useSearchParams } from "next/navigation";
@@ -11,7 +12,7 @@ export function useChartPriceFormat(): DeepPartial<PriceFormat> {
   const symbol = searchParams.get("symbol");
   const { exchangeInfoResponse } = useSymbolDataCardContext();
 
-  const chartPriceFormat: DeepPartial<PriceFormat> = (() => {
+  const chartPriceFormat = useMemo<DeepPartial<PriceFormat>>(() => {
     const foundSymbolInfo = exchangeInfoResponse.symbols.find(
       (symbolInfo) => symbolInfo.symbol === symbol
     );
@@ -23,7 +24,7 @@ export function useChartPriceFormat(): DeepPartial<PriceFormat> {
     );
 
     return { type: "price", minMove };
-  })();
+  }, [exchangeInfoResponse.symbols, symbol]);
 
   return chartPriceFormat;
 }
