@@ -1,12 +1,10 @@
-import { useMemo } from "react";
-
 import useGlobalStore from "@/lib/hooks/use-global-store";
 import { TradingMode } from "@/lib/types";
 
-export function useAvailableBalance() {
+const useBalance = () => {
   const { balance: demoBalance, tradingMode } = useGlobalStore();
 
-  const balance = useMemo(() => {
+  const balance = (() => {
     if (tradingMode === TradingMode.Demo) {
       return demoBalance;
     }
@@ -14,7 +12,9 @@ export function useAvailableBalance() {
       return 0;
     }
     return 0;
-  }, [demoBalance, tradingMode]);
+  })();
 
   return balance;
-}
+};
+
+export default useBalance;

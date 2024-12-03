@@ -15,14 +15,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAvailableBalance } from "@/lib/hooks/use-available-balance";
+import useBalance from "@/lib/hooks/use-balance";
 import useGlobalStore from "@/lib/hooks/use-global-store";
 import { TradingMode } from "@/lib/types";
 
 export function WithdrawButton() {
   const { tradingMode, updateBalance } = useGlobalStore();
   const [open, setOpen] = useState(false);
-  const balance = useAvailableBalance();
+  const balance = useBalance();
 
   const [withdrawAmount, setWithdrawAmount] = useState("");
 

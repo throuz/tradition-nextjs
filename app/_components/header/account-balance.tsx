@@ -1,9 +1,9 @@
 "use client";
 
-import { useAvailableBalance } from "@/lib/hooks/use-available-balance";
+import useBalance from "@/lib/hooks/use-balance";
 
 export function AccountBalance() {
-  const balance = useAvailableBalance();
+  const balance = useBalance();
 
   return (
     <div className="text-lg font-medium text-primary">

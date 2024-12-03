@@ -6,17 +6,16 @@ import { toast } from "sonner";
 import { z, ZodIssueCode } from "zod";
 
 import { fetchTicker } from "@/lib/api/ticker";
+import useBalance from "@/lib/hooks/use-balance";
 import useGlobalStore from "@/lib/hooks/use-global-store";
 import { OrderSide, Position } from "@/lib/types";
 import { calculateLiqPrice } from "@/lib/utils";
-
-import { useAvailableBalance } from "../../../../lib/hooks/use-available-balance";
 
 import { usePriceDecimalDigits } from "./use-price-decimal-digits";
 
 const usePlaceOrderForm = () => {
   const { updateBalance, createPosition } = useGlobalStore();
-  const balance = useAvailableBalance();
+  const balance = useBalance();
   const priceDecimalDigits = usePriceDecimalDigits();
   const searchParams = useSearchParams();
   const symbol = searchParams.get("symbol") as string;
