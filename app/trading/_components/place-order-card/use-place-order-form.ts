@@ -7,14 +7,19 @@ import { z, ZodIssueCode } from "zod";
 
 import { fetchTicker } from "@/lib/api/ticker";
 import useBalance from "@/lib/hooks/use-balance";
-import useGlobalStore from "@/lib/hooks/use-global-store";
+import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
 import { OrderSide, Position } from "@/lib/types";
 import { calculateLiqPrice } from "@/lib/utils";
 
 import { usePriceDecimalDigits } from "./use-price-decimal-digits";
 
 const usePlaceOrderForm = () => {
-  const { updateBalance, createPosition } = useGlobalStore();
+  const demoAccountUpdateBalance = useDemoAccountStore(
+    (state) => state.updateBalance
+  );
+  const demoAccountCreatePosition = useDemoAccountStore(
+    (state) => state.createPosition
+  );
   const balance = useBalance();
   const priceDecimalDigits = usePriceDecimalDigits();
   const searchParams = useSearchParams();
@@ -204,8 +209,8 @@ const usePlaceOrderForm = () => {
           stopLossPrice: stopLossPrice,
           createdAt: Date.now(),
         };
-        createPosition(position);
-        updateBalance(-amount);
+        demoAccountCreatePosition(position);
+        demoAccountUpdateBalance(-amount);
         toast.success(`Order placed: ${JSON.stringify(values)}`);
         form.reset();
       } catch (error) {

@@ -7,7 +7,8 @@ import useGlobalStore from "@/lib/hooks/use-global-store";
 import { TradingMode } from "@/lib/types";
 
 export function TradingModeSelector() {
-  const { tradingMode, updateTradingMode } = useGlobalStore();
+  const tradingMode = useGlobalStore((state) => state.tradingMode);
+  const updateTradingMode = useGlobalStore((state) => state.updateTradingMode);
 
   const modes = [
     { label: "Real Mode", value: TradingMode.Real },

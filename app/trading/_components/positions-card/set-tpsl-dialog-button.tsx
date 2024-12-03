@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import useGlobalStore from "@/lib/hooks/use-global-store";
+import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
 import { OrderSide, Position } from "@/lib/types";
 import { calculateLiqPrice } from "@/lib/utils";
 
@@ -37,7 +37,9 @@ interface SetTPSLDialogButtonProps {
 
 const SetTPSLDialogButton = ({ position }: SetTPSLDialogButtonProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
-  const { updatePosition } = useGlobalStore();
+  const demoAccountUpdatePosition = useDemoAccountStore(
+    (state) => state.updatePosition
+  );
   const priceDecimalDigits = usePriceDecimalDigits(position.symbol);
 
   const formSchema = z
@@ -152,7 +154,7 @@ const SetTPSLDialogButton = ({ position }: SetTPSLDialogButtonProps) => {
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof formSchema>) => {
       try {
-        updatePosition(position.id, values);
+        demoAccountUpdatePosition(position.id, values);
         toast.success(`TP/SL updated: ${JSON.stringify(values)}`);
         setDialogOpen(false);
       } catch (error) {

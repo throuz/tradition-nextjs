@@ -4,12 +4,17 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { fetchTicker } from "@/lib/api/ticker";
-import useGlobalStore from "@/lib/hooks/use-global-store";
+import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
 import { Position } from "@/lib/types";
 import { calculatePnl } from "@/lib/utils";
 
 const ClosePositionButton = ({ position }: { position: Position }) => {
-  const { deletePosition, updateBalance } = useGlobalStore();
+  const demoAccountUpdateBalance = useDemoAccountStore(
+    (state) => state.updateBalance
+  );
+  const demoAccountDeletePosition = useDemoAccountStore(
+    (state) => state.deletePosition
+  );
 
   const handleClosePosition = async () => {
     try {
@@ -20,8 +25,8 @@ const ClosePositionButton = ({ position }: { position: Position }) => {
         size: position.size,
         side: position.side,
       });
-      updateBalance(pnl);
-      deletePosition(position.id);
+      demoAccountUpdateBalance(pnl);
+      demoAccountDeletePosition(position.id);
       toast.success("Position closed successfully");
     } catch (error) {
       toast.error((error as Error).message);

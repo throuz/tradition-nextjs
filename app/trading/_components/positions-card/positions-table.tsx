@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import useGlobalStore from "@/lib/hooks/use-global-store";
+import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
 import useTickerStream from "@/lib/streams/use-ticker-stream";
 import { OrderSide, Position } from "@/lib/types";
 import { calculatePnl, cn } from "@/lib/utils";
@@ -29,7 +29,9 @@ const LastPriceCell = ({ symbol }: { symbol: string }) => {
 
 const PnlRoiCell = ({ position }: { position: Position }) => {
   const tickerStream = useTickerStream(position.symbol);
-  const { deletePosition } = useGlobalStore();
+  const demoAccountDeletePosition = useDemoAccountStore(
+    (state) => state.deletePosition
+  );
 
   useEffect(() => {
     if (!tickerStream) return;
@@ -52,10 +54,10 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
       return false;
     })();
     if (isTriggered) {
-      deletePosition(position.id);
+      demoAccountDeletePosition(position.id);
     }
   }, [
-    deletePosition,
+    demoAccountDeletePosition,
     position.id,
     position.liquidationPrice,
     position.side,
@@ -178,7 +180,7 @@ const columns: Column[] = [
 ];
 
 const PositionsTable = () => {
-  const { positions } = useGlobalStore();
+  const demoAccountPositions = useDemoAccountStore((state) => state.positions);
 
   const heads = columns.map((column, i) => (
     <TableHead key={i} className="text-center">
@@ -200,7 +202,7 @@ const PositionsTable = () => {
         <TableRow>{heads}</TableRow>
       </TableHeader>
       <TableBody>
-        {positions.map((position) => (
+        {demoAccountPositions.map((position) => (
           <TableRow key={position.id}>{cells(position)}</TableRow>
         ))}
       </TableBody>

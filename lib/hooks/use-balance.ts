@@ -1,12 +1,15 @@
 import useGlobalStore from "@/lib/hooks/use-global-store";
 import { TradingMode } from "@/lib/types";
 
+import useDemoAccountStore from "./use-demo-account-store";
+
 const useBalance = () => {
-  const { balance: demoBalance, tradingMode } = useGlobalStore();
+  const demoAccountBalance = useDemoAccountStore((state) => state.balance);
+  const tradingMode = useGlobalStore((state) => state.tradingMode);
 
   const balance = (() => {
     if (tradingMode === TradingMode.Demo) {
-      return demoBalance;
+      return demoAccountBalance;
     }
     if (tradingMode === TradingMode.Real) {
       return 0;
