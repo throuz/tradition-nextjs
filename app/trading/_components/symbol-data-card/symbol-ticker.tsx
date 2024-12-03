@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
 import useTickerStream from "../../../../lib/streams/use-ticker-stream";
@@ -17,11 +16,11 @@ export function SymbolTicker() {
 
   const lastPrice = tickerStream?.c || ticker24hrResponse.lastPrice;
 
-  const priceChange = useMemo(() => {
+  const priceChange = (() => {
     const priceChangeValue = tickerStream?.P || ticker24hrResponse.priceChange;
     const changeValue = parseFloat(priceChangeValue);
     return `${changeValue >= 0 ? "+" : ""}${changeValue.toFixed(2)}`;
-  }, [tickerStream?.P, ticker24hrResponse.priceChange]);
+  })();
 
   return (
     <div className="flex flex-col lg:flex-row items-center gap-4">

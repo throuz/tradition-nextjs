@@ -1,12 +1,16 @@
-import React from "react";
-
 import { useSymbolDataCardContext } from "./context";
 
-export function useSymbols() {
+interface Symbol {
+  symbol: string;
+  quoteVolume: number;
+  priceChangePercent: string;
+}
+
+export function useSymbols(): Symbol[] {
   const { exchangeInfoResponse, ticker24hrAllSymbolsResponse } =
     useSymbolDataCardContext();
 
-  const tickerMap = React.useMemo(() => {
+  const tickerMap = (() => {
     const map: Record<
       string,
       { quoteVolume: number; priceChangePercent: string }
@@ -21,9 +25,9 @@ export function useSymbols() {
       };
     });
     return map;
-  }, [ticker24hrAllSymbolsResponse]);
+  })();
 
-  const symbols = React.useMemo(() => {
+  const symbols = (() => {
     return exchangeInfoResponse.symbols
       .filter(
         (symbolInfo) =>
@@ -38,7 +42,7 @@ export function useSymbols() {
           tickerMap[symbolInfo.symbol]?.priceChangePercent || "0%",
       }))
       .sort((a, b) => b.quoteVolume - a.quoteVolume);
-  }, [exchangeInfoResponse, tickerMap]);
+  })();
 
   return symbols;
 }
