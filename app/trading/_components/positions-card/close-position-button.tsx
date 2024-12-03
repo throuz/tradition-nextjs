@@ -9,7 +9,7 @@ import { Position } from "@/lib/types";
 import { calculatePnl } from "@/lib/utils";
 
 const ClosePositionButton = ({ position }: { position: Position }) => {
-  const { closePosition, updateBalance } = useGlobalStore();
+  const { deletePosition, updateBalance } = useGlobalStore();
 
   const handleClosePosition = async () => {
     try {
@@ -21,7 +21,7 @@ const ClosePositionButton = ({ position }: { position: Position }) => {
         side: position.side,
       });
       updateBalance(pnl);
-      closePosition(position.id);
+      deletePosition(position.id);
       toast.success("Position closed successfully");
     } catch (error) {
       toast.error((error as Error).message);

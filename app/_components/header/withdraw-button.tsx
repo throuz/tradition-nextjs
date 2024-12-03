@@ -22,7 +22,7 @@ import { TradingMode } from "@/lib/types";
 export function WithdrawButton() {
   const { tradingMode, updateBalance } = useGlobalStore();
   const [open, setOpen] = useState(false);
-  const availableBalance = useAvailableBalance();
+  const balance = useAvailableBalance();
 
   const [withdrawAmount, setWithdrawAmount] = useState("");
 
@@ -34,7 +34,7 @@ export function WithdrawButton() {
       return;
     }
 
-    if (amount > availableBalance) {
+    if (amount > balance) {
       toast.error("Insufficient balance for this withdrawal.");
       return;
     }

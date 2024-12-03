@@ -15,8 +15,8 @@ import { useAvailableBalance } from "../../../../lib/hooks/use-available-balance
 import { usePriceDecimalDigits } from "./use-price-decimal-digits";
 
 const usePlaceOrderForm = () => {
-  const { updateBalance, openPosition } = useGlobalStore();
-  const availableBalance = useAvailableBalance();
+  const { updateBalance, createPosition } = useGlobalStore();
+  const balance = useAvailableBalance();
   const priceDecimalDigits = usePriceDecimalDigits();
   const searchParams = useSearchParams();
   const symbol = searchParams.get("symbol") as string;
@@ -40,8 +40,8 @@ const usePlaceOrderForm = () => {
         z
           .number()
           .min(0.01, { message: "Amount must be at least 0.01" })
-          .max(availableBalance, {
-            message: `Amount cannot exceed ${availableBalance}`,
+          .max(balance, {
+            message: `Amount cannot exceed ${balance}`,
           })
           .refine((value) => Number(value.toFixed(2)) === value, {
             message: "Amount can have at most 2 decimal places",
@@ -205,7 +205,7 @@ const usePlaceOrderForm = () => {
           stopLossPrice: stopLossPrice,
           createdAt: Date.now(),
         };
-        openPosition(position);
+        createPosition(position);
         updateBalance(-amount);
         toast.success(`Order placed: ${JSON.stringify(values)}`);
         form.reset();

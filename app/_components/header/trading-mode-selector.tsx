@@ -7,7 +7,7 @@ import useGlobalStore from "@/lib/hooks/use-global-store";
 import { TradingMode } from "@/lib/types";
 
 export function TradingModeSelector() {
-  const { tradingMode, setTradingMode } = useGlobalStore();
+  const { tradingMode, updateTradingMode } = useGlobalStore();
 
   const modes = [
     { label: "Real Mode", value: TradingMode.Real },
@@ -18,7 +18,7 @@ export function TradingModeSelector() {
     <Tabs
       defaultValue={tradingMode}
       onValueChange={(value) => {
-        setTradingMode(value as TradingMode);
+        updateTradingMode(value as TradingMode);
       }}
     >
       <TabsList className="grid w-full grid-cols-2">

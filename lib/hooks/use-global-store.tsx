@@ -4,32 +4,28 @@ import { persist } from "zustand/middleware";
 import { Position, TradingMode } from "../types";
 
 interface GlobalStore {
-  availableBalance: number;
+  balance: number;
   updateBalance: (amount: number) => void;
   positions: Position[];
-  openPosition: (position: Position) => void;
-  closePosition: (id: string) => void;
+  createPosition: (position: Position) => void;
   updatePosition: (id: string, updates: Partial<Position>) => void;
+  deletePosition: (id: string) => void;
   tradingMode: TradingMode;
-  setTradingMode: (tradingMode: TradingMode) => void;
+  updateTradingMode: (tradingMode: TradingMode) => void;
 }
 
 const useGlobalStore = create<GlobalStore>()(
   persist(
     (set) => ({
-      availableBalance: 0,
+      balance: 0,
       updateBalance: (amount: number) =>
         set((state) => ({
-          availableBalance: state.availableBalance + amount,
+          balance: state.balance + amount,
         })),
       positions: [],
-      openPosition: (position: Position) =>
+      createPosition: (position: Position) =>
         set((state) => ({
           positions: [...state.positions, position],
-        })),
-      closePosition: (id: string) =>
-        set((state) => ({
-          positions: state.positions.filter((position) => position.id !== id),
         })),
       updatePosition: (id: string, updates: Partial<Position>) =>
         set((state) => ({
@@ -37,8 +33,12 @@ const useGlobalStore = create<GlobalStore>()(
             position.id === id ? { ...position, ...updates } : position
           ),
         })),
+      deletePosition: (id: string) =>
+        set((state) => ({
+          positions: state.positions.filter((position) => position.id !== id),
+        })),
       tradingMode: TradingMode.Demo,
-      setTradingMode: (tradingMode: TradingMode) => set({ tradingMode }),
+      updateTradingMode: (tradingMode: TradingMode) => set({ tradingMode }),
     }),
     {
       name: "global-storage",

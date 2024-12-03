@@ -7,7 +7,7 @@ import useGlobalStore from "@/lib/hooks/use-global-store";
 import { TradingMode } from "@/lib/types";
 
 export function TradingModeButtons() {
-  const { tradingMode, setTradingMode } = useGlobalStore();
+  const { tradingMode, updateTradingMode } = useGlobalStore();
 
   const modes = [
     { label: "Real", value: TradingMode.Real },
@@ -21,7 +21,7 @@ export function TradingModeButtons() {
           key={value}
           type="button"
           variant={tradingMode === value ? "default" : "secondary"}
-          onClick={() => setTradingMode(value)}
+          onClick={() => updateTradingMode(value)}
           aria-pressed={tradingMode === value}
           className="w-full"
         >

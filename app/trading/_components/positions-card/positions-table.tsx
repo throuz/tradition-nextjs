@@ -29,7 +29,7 @@ const LastPriceCell = ({ symbol }: { symbol: string }) => {
 
 const PnlRoiCell = ({ position }: { position: Position }) => {
   const tickerStream = useTickerStream(position.symbol);
-  const { closePosition } = useGlobalStore();
+  const { deletePosition } = useGlobalStore();
 
   useEffect(() => {
     if (!tickerStream) return;
@@ -52,10 +52,10 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
       return false;
     })();
     if (isTriggered) {
-      closePosition(position.id);
+      deletePosition(position.id);
     }
   }, [
-    closePosition,
+    deletePosition,
     position.id,
     position.liquidationPrice,
     position.side,
