@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
-
 import { KlineInterval } from "@/lib/types";
 
-import useWebSocketStore from "../hooks/use-websocket-store";
+import useWebSocketStream from "./use-web-socket-stream";
 
 export interface KlineStream {
   e: string; // Event type
@@ -33,46 +31,12 @@ const useKlineStream = (
   symbol: string | null,
   interval: KlineInterval | null
 ) => {
-  const [data, setData] = useState<KlineStream | null>(null);
-
-  const connect = useWebSocketStore((state) => state.connect);
-  const disconnect = useWebSocketStore((state) => state.disconnect);
-  const messages = useWebSocketStore((state) => state.messages);
-
   const url =
     symbol && interval
       ? `wss://fstream.binance.com/ws/${symbol.toLowerCase()}@kline_${interval}`
       : null;
 
-  useEffect(() => {
-    if (url) {
-      connect(url);
-    }
-
-    return () => {
-      if (url) {
-        disconnect(url);
-      }
-    };
-  }, [url, connect, disconnect]);
-
-  useEffect(() => {
-    if (url && messages.has(url)) {
-      const allMessages = messages.get(url) || [];
-      const latestMessage = allMessages[allMessages.length - 1];
-
-      if (latestMessage) {
-        try {
-          const parsedData: KlineStream = JSON.parse(latestMessage);
-          setData(parsedData);
-        } catch (e) {
-          console.error("Failed to parse WebSocket message", e);
-        }
-      }
-    }
-  }, [messages, url]);
-
-  return data;
+  return useWebSocketStream<KlineStream>(url);
 };
 
 export default useKlineStream;

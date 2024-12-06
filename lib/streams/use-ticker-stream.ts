@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-
-import useWebSocketStore from "../hooks/use-websocket-store";
+import useWebSocketStream from "./use-web-socket-stream";
 
 export interface TickerStream {
   e: string; // Event type
@@ -24,45 +22,11 @@ export interface TickerStream {
 }
 
 const useTickerStream = (symbol: string | null) => {
-  const [data, setData] = useState<TickerStream | null>(null);
-
-  const connect = useWebSocketStore((state) => state.connect);
-  const disconnect = useWebSocketStore((state) => state.disconnect);
-  const messages = useWebSocketStore((state) => state.messages);
-
   const url = symbol
     ? `wss://fstream.binance.com/ws/${symbol.toLowerCase()}@ticker`
     : null;
 
-  useEffect(() => {
-    if (url) {
-      connect(url);
-    }
-
-    return () => {
-      if (url) {
-        disconnect(url);
-      }
-    };
-  }, [url, connect, disconnect]);
-
-  useEffect(() => {
-    if (url && messages.has(url)) {
-      const allMessages = messages.get(url) || [];
-      const latestMessage = allMessages[allMessages.length - 1];
-
-      if (latestMessage) {
-        try {
-          const parsedData: TickerStream = JSON.parse(latestMessage);
-          setData(parsedData);
-        } catch (e) {
-          console.error("Failed to parse WebSocket message", e);
-        }
-      }
-    }
-  }, [messages, url]);
-
-  return data;
+  return useWebSocketStream<TickerStream>(url);
 };
 
 export default useTickerStream;
