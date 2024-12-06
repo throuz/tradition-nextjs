@@ -1,7 +1,7 @@
-import useGlobalStore from "@/lib/hooks/use-global-store";
+import useGlobalStore from "@/lib/stores/use-global-store";
 import { TradingMode } from "@/lib/types";
 
-import useDemoAccountStore from "./use-demo-account-store";
+import useDemoAccountStore from "../stores/use-demo-account-store";
 
 const useBalance = () => {
   const demoAccountBalance = useDemoAccountStore((state) => state.balance);

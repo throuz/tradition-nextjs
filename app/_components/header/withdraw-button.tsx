@@ -16,8 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useBalance from "@/lib/hooks/use-balance";
-import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
-import useGlobalStore from "@/lib/hooks/use-global-store";
+import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
+import useGlobalStore from "@/lib/stores/use-global-store";
 import { TradingMode } from "@/lib/types";
 
 export function WithdrawButton() {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { create } from "zustand";
 
-import useWebSocketStore from "../hooks/use-websocket-store";
+import useWebSocketStore from "../stores/use-websocket-store";
 
 interface StreamConsumersStore {
   consumersMap: Map<string, number>;

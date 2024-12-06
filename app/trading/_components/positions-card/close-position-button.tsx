@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { fetchTicker } from "@/lib/api/ticker";
-import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
+import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
 import { Position } from "@/lib/types";
 import { calculatePnl } from "@/lib/utils";
 

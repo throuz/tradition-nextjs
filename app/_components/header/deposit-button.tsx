@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
-import useGlobalStore from "@/lib/hooks/use-global-store";
+import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
+import useGlobalStore from "@/lib/stores/use-global-store";
 import { TradingMode } from "@/lib/types";
 
 export function DepositButton() {

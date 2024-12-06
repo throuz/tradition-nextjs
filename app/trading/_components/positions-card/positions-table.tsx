@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
+import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
 import useTickerStream from "@/lib/streams/use-ticker-stream";
 import { OrderSide, Position } from "@/lib/types";
 import { calculatePnl, cn } from "@/lib/utils";

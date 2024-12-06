@@ -7,7 +7,7 @@ import { z, ZodIssueCode } from "zod";
 
 import { fetchTicker } from "@/lib/api/ticker";
 import useBalance from "@/lib/hooks/use-balance";
-import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
+import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
 import { OrderSide, Position } from "@/lib/types";
 import { calculateLiqPrice } from "@/lib/utils";
 

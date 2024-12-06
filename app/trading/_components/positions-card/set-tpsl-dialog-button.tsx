@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import useDemoAccountStore from "@/lib/hooks/use-demo-account-store";
+import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
 import { OrderSide, Position } from "@/lib/types";
 import { calculateLiqPrice } from "@/lib/utils";
 
