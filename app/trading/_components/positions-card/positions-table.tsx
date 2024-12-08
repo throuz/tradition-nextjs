@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
-import useTickerStream from "@/lib/streams/use-ticker-stream";
+import useLastPriceStream from "@/lib/streams/use-last-price-stream";
 import { OrderSide, Position } from "@/lib/types";
 import { calculatePnl, cn } from "@/lib/utils";
 
@@ -21,15 +21,15 @@ import ClosePositionButton from "./close-position-button";
 import SetTPSLDialogButton from "./set-tpsl-dialog-button";
 
 const LastPriceCell = ({ symbol }: { symbol: string }) => {
-  const tickerStream = useTickerStream(symbol);
-  if (tickerStream) {
-    return `$${tickerStream.c.toLocaleString()}`;
+  const lastPriceStream = useLastPriceStream(symbol);
+  if (lastPriceStream) {
+    return `$${lastPriceStream.toLocaleString()}`;
   }
   return "-";
 };
 
 const PnlRoiCell = ({ position }: { position: Position }) => {
-  const tickerStream = useTickerStream(position.symbol);
+  const lastPriceStream = useLastPriceStream(position.symbol);
   const demoAccountUpdateBalance = useDemoAccountStore(
     (state) => state.updateBalance
   );
@@ -38,8 +38,8 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
   );
 
   useEffect(() => {
-    if (!tickerStream) return;
-    const lastPrice = Number(tickerStream.c);
+    if (!lastPriceStream) return;
+    const lastPrice = Number(lastPriceStream);
     const isTPSLTriggered = (() => {
       if (position.side === OrderSide.Buy) {
         return (
@@ -89,15 +89,15 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
     position.size,
     position.stopLossPrice,
     position.takeProfitPrice,
-    tickerStream,
+    lastPriceStream,
   ]);
 
-  if (!tickerStream) {
+  if (!lastPriceStream) {
     return "-";
   }
 
   const pnl = calculatePnl({
-    lastPrice: Number(tickerStream.c),
+    lastPrice: Number(lastPriceStream),
     entryPrice: position.entryPrice,
     size: position.size,
     side: position.side,
