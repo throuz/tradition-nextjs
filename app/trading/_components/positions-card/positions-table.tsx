@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect } from "react";
+import { toast } from "sonner";
 
 import {
   Table,
@@ -29,6 +30,9 @@ const LastPriceCell = ({ symbol }: { symbol: string }) => {
 
 const PnlRoiCell = ({ position }: { position: Position }) => {
   const tickerStream = useTickerStream(position.symbol);
+  const demoAccountUpdateBalance = useDemoAccountStore(
+    (state) => state.updateBalance
+  );
   const demoAccountDeletePosition = useDemoAccountStore(
     (state) => state.deletePosition
   );
@@ -36,31 +40,53 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
   useEffect(() => {
     if (!tickerStream) return;
     const lastPrice = Number(tickerStream.c);
-    const isTriggered = (() => {
+    const isTPSLTriggered = (() => {
       if (position.side === OrderSide.Buy) {
         return (
           (position.takeProfitPrice && lastPrice >= position.takeProfitPrice) ||
-          (position.stopLossPrice && lastPrice <= position.stopLossPrice) ||
-          lastPrice <= position.liquidationPrice
+          (position.stopLossPrice && lastPrice <= position.stopLossPrice)
         );
       }
       if (position.side === OrderSide.Sell) {
         return (
           (position.takeProfitPrice && lastPrice <= position.takeProfitPrice) ||
-          (position.stopLossPrice && lastPrice >= position.stopLossPrice) ||
-          lastPrice >= position.liquidationPrice
+          (position.stopLossPrice && lastPrice >= position.stopLossPrice)
         );
       }
       return false;
     })();
-    if (isTriggered) {
+    const isLiqTriggered = (() => {
+      if (position.side === OrderSide.Buy) {
+        return lastPrice <= position.liquidationPrice;
+      }
+      if (position.side === OrderSide.Sell) {
+        return lastPrice >= position.liquidationPrice;
+      }
+      return false;
+    })();
+    if (isTPSLTriggered) {
+      const pnl = calculatePnl({
+        lastPrice: lastPrice,
+        entryPrice: position.entryPrice,
+        size: position.size,
+        side: position.side,
+      });
+      demoAccountUpdateBalance(pnl);
       demoAccountDeletePosition(position.id);
+      toast.success("Position closed successfully");
+    }
+    if (isLiqTriggered) {
+      demoAccountDeletePosition(position.id);
+      toast.success("Position closed successfully");
     }
   }, [
     demoAccountDeletePosition,
+    demoAccountUpdateBalance,
+    position.entryPrice,
     position.id,
     position.liquidationPrice,
     position.side,
+    position.size,
     position.stopLossPrice,
     position.takeProfitPrice,
     tickerStream,
