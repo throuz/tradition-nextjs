@@ -50,3 +50,10 @@ export const calculatePnl = ({
     ? (lastPrice - entryPrice) * size
     : (lastPrice - entryPrice) * size * -1;
 };
+
+export const formatWithSign = (value: number): string => {
+  if (value > 0) {
+    return `+${value}`;
+  }
+  return `${value}`;
+};
