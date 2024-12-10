@@ -183,11 +183,16 @@ export enum TradingMode {
   Demo = "DEMO",
 }
 
+export enum PositionStatus {
+  Open = "OPEN",
+  Closed = "CLOSED",
+}
+
 export interface Position {
   id: string;
   accountId: string;
-  side: OrderSide;
   symbol: string;
+  side: OrderSide;
   size: number;
   entryPrice: number;
   leverage: number;
@@ -195,6 +200,9 @@ export interface Position {
   liquidationPrice: number;
   takeProfitPrice?: number;
   stopLossPrice?: number;
+  closePrice?: number;
+  status: PositionStatus;
   createdAt: number;
+  closedAt?: number;
   updatedAt?: number;
 }
