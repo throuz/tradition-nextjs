@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
 import useLastPriceStream from "@/lib/streams/use-last-price-stream";
-import { OrderSide, Position } from "@/lib/types";
+import { OrderSide, Position, PositionStatus } from "@/lib/types";
 import { calculatePnl, cn } from "@/lib/utils";
 
 import ClosePositionButton from "./close-position-button";
@@ -29,67 +29,84 @@ const LastPriceCell = ({ symbol }: { symbol: string }) => {
 };
 
 const PnlRoiCell = ({ position }: { position: Position }) => {
-  const lastPriceStream = useLastPriceStream(position.symbol);
+  const {
+    id,
+    symbol,
+    entryPrice,
+    size,
+    side,
+    takeProfitPrice,
+    stopLossPrice,
+    liquidationPrice,
+    initialMargin,
+  } = position;
+  const lastPriceStream = useLastPriceStream(symbol);
   const demoAccountUpdateBalance = useDemoAccountStore(
     (state) => state.updateBalance
   );
-  const demoAccountDeletePosition = useDemoAccountStore(
-    (state) => state.deletePosition
+  const demoAccountUpdatePosition = useDemoAccountStore(
+    (state) => state.updatePosition
   );
 
   useEffect(() => {
     if (!lastPriceStream) return;
     const lastPrice = Number(lastPriceStream);
     const isTPSLTriggered = (() => {
-      if (position.side === OrderSide.Buy) {
+      if (side === OrderSide.Buy) {
         return (
-          (position.takeProfitPrice && lastPrice >= position.takeProfitPrice) ||
-          (position.stopLossPrice && lastPrice <= position.stopLossPrice)
+          (takeProfitPrice && lastPrice >= takeProfitPrice) ||
+          (stopLossPrice && lastPrice <= stopLossPrice)
         );
       }
-      if (position.side === OrderSide.Sell) {
+      if (side === OrderSide.Sell) {
         return (
-          (position.takeProfitPrice && lastPrice <= position.takeProfitPrice) ||
-          (position.stopLossPrice && lastPrice >= position.stopLossPrice)
+          (takeProfitPrice && lastPrice <= takeProfitPrice) ||
+          (stopLossPrice && lastPrice >= stopLossPrice)
         );
       }
       return false;
     })();
     const isLiqTriggered = (() => {
-      if (position.side === OrderSide.Buy) {
-        return lastPrice <= position.liquidationPrice;
+      if (side === OrderSide.Buy) {
+        return lastPrice <= liquidationPrice;
       }
-      if (position.side === OrderSide.Sell) {
-        return lastPrice >= position.liquidationPrice;
+      if (side === OrderSide.Sell) {
+        return lastPrice >= liquidationPrice;
       }
       return false;
     })();
     if (isTPSLTriggered) {
-      const pnl = calculatePnl({
-        lastPrice: lastPrice,
-        entryPrice: position.entryPrice,
-        size: position.size,
-        side: position.side,
-      });
+      const pnl = calculatePnl({ lastPrice, entryPrice, size, side });
       demoAccountUpdateBalance(pnl);
-      demoAccountDeletePosition(position.id);
+      demoAccountUpdatePosition(id, {
+        status: PositionStatus.Closed,
+        closePrice: lastPrice,
+        realizedPnL: pnl,
+        closedAt: Date.now(),
+      });
       toast.success("Position closed successfully");
     }
     if (isLiqTriggered) {
-      demoAccountDeletePosition(position.id);
+      demoAccountUpdatePosition(id, {
+        status: PositionStatus.Closed,
+        closePrice: lastPrice,
+        realizedPnL: -initialMargin,
+        closedAt: Date.now(),
+      });
       toast.success("Position closed successfully");
     }
   }, [
-    demoAccountDeletePosition,
     demoAccountUpdateBalance,
-    position.entryPrice,
-    position.id,
-    position.liquidationPrice,
-    position.side,
-    position.size,
-    position.stopLossPrice,
-    position.takeProfitPrice,
+    demoAccountUpdatePosition,
+    entryPrice,
+    id,
+    initialMargin,
     lastPriceStream,
+    liquidationPrice,
+    side,
+    size,
+    stopLossPrice,
+    takeProfitPrice,
   ]);
 
   if (!lastPriceStream) {
@@ -98,11 +115,11 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
 
   const pnl = calculatePnl({
     lastPrice: Number(lastPriceStream),
-    entryPrice: position.entryPrice,
-    size: position.size,
-    side: position.side,
+    entryPrice: entryPrice,
+    size: size,
+    side: side,
   });
-  const roi = (pnl / position.initialMargin) * 100;
+  const roi = (pnl / initialMargin) * 100;
   const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(2)}`;
   const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi).toFixed(2)}%`;
 
@@ -208,6 +225,10 @@ const columns: Column[] = [
 const PositionsTable = () => {
   const demoAccountPositions = useDemoAccountStore((state) => state.positions);
 
+  const demoAccountOpenPositions = demoAccountPositions.filter(
+    (position) => position.status === PositionStatus.Open
+  );
+
   const heads = columns.map((column, i) => (
     <TableHead key={i} className="text-center">
       {column.head}
@@ -228,7 +249,7 @@ const PositionsTable = () => {
         <TableRow>{heads}</TableRow>
       </TableHeader>
       <TableBody>
-        {demoAccountPositions.map((position) => (
+        {demoAccountOpenPositions.map((position) => (
           <TableRow key={position.id}>{cells(position)}</TableRow>
         ))}
       </TableBody>

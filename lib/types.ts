@@ -201,6 +201,7 @@ export interface Position {
   takeProfitPrice?: number;
   stopLossPrice?: number;
   closePrice?: number;
+  realizedPnL?: number;
   status: PositionStatus;
   createdAt: number;
   closedAt?: number;

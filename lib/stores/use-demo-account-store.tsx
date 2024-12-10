@@ -9,7 +9,6 @@ interface DemoAccountStore {
   positions: Position[];
   createPosition: (position: Position) => void;
   updatePosition: (id: string, updates: Partial<Position>) => void;
-  deletePosition: (id: string) => void;
 }
 
 const useDemoAccountStore = create<DemoAccountStore>()(
@@ -30,10 +29,6 @@ const useDemoAccountStore = create<DemoAccountStore>()(
           positions: state.positions.map((position) =>
             position.id === id ? { ...position, ...updates } : position
           ),
-        })),
-      deletePosition: (id: string) =>
-        set((state) => ({
-          positions: state.positions.filter((position) => position.id !== id),
         })),
     }),
     {
