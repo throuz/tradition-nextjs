@@ -18,11 +18,11 @@ const ClosePositionButton = ({ position }: { position: Position }) => {
 
   const handleClosePosition = async () => {
     try {
-      const { id, symbol, entryPrice, size, side } = position;
+      const { id, symbol, entryPrice, size, side, initialMargin } = position;
       const tickerResponse = await fetchTicker(symbol);
       const lastPrice = Number(tickerResponse.price);
       const pnl = calculatePnl({ lastPrice, entryPrice, size, side });
-      demoAccountUpdateBalance(pnl);
+      demoAccountUpdateBalance(initialMargin + pnl);
       demoAccountUpdatePosition(id, {
         status: PositionStatus.Closed,
         closePrice: lastPrice,

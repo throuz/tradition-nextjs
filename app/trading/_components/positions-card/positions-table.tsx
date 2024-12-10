@@ -77,7 +77,7 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
     })();
     if (isTPSLTriggered) {
       const pnl = calculatePnl({ lastPrice, entryPrice, size, side });
-      demoAccountUpdateBalance(pnl);
+      demoAccountUpdateBalance(initialMargin + pnl);
       demoAccountUpdatePosition(id, {
         status: PositionStatus.Closed,
         closePrice: lastPrice,
