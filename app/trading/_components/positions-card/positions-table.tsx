@@ -1,17 +1,10 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { useEffect } from "react";
+import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { DataTable } from "@/components/ui/data-table";
 import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
 import useLastPriceStream from "@/lib/streams/use-last-price-stream";
 import { OrderSide, Position, PositionStatus } from "@/lib/types";
@@ -130,19 +123,17 @@ const PnlRoiCell = ({ position }: { position: Position }) => {
   );
 };
 
-interface Column {
-  head: string;
-  cell: (rowData: Position) => ReactNode;
-}
-
-const columns: Column[] = [
+const columns: ColumnDef<Position>[] = [
   {
-    head: "Symbol",
-    cell: (rowData) => rowData.symbol,
+    accessorKey: "symbol",
+    header: "Symbol",
+    cell: (props) => props.getValue<string>(),
   },
   {
-    head: "Side",
-    cell: (rowData) => {
+    accessorKey: "side",
+    header: "Side",
+    cell: (props) => {
+      const side = props.getValue<OrderSide>();
       const orderSideMap: Record<OrderSide, string> = {
         [OrderSide.Buy]: "Buy",
         [OrderSide.Sell]: "Sell",
@@ -150,73 +141,88 @@ const columns: Column[] = [
       return (
         <div
           className={cn(
-            rowData.side === OrderSide.Buy && "text-green-500",
-            rowData.side === OrderSide.Sell && "text-red-500"
+            side === OrderSide.Buy && "text-green-500",
+            side === OrderSide.Sell && "text-red-500"
           )}
         >
-          {orderSideMap[rowData.side]}
+          {orderSideMap[side]}
         </div>
       );
     },
   },
   {
-    head: "Size",
-    cell: (rowData) => {
-      const formatedSize = rowData.size.toLocaleString(undefined, {
+    accessorKey: "size",
+    header: "Size",
+    cell: (props) => {
+      const size = props.getValue<number>();
+      const formatedSize = size.toLocaleString(undefined, {
         minimumFractionDigits: 2,
       });
-      const formatedSymbol = rowData.symbol.replace(/USDT$/, "");
+      const symbol = props.row.getValue<string>("symbol");
+      const formatedSymbol = symbol.replace(/USDT$/, "");
       return `${formatedSize} ${formatedSymbol}`;
     },
   },
   {
-    head: "Entry Price",
-    cell: (rowData) => `$${rowData.entryPrice.toLocaleString()}`,
+    accessorKey: "entryPrice",
+    header: "Entry Price",
+    cell: (props) => `$${props.getValue<number>().toLocaleString()}`,
   },
   {
-    head: "Last Price",
-    cell: (rowData) => <LastPriceCell symbol={rowData.symbol} />,
+    id: "lastPrice",
+    header: "Last Price",
+    cell: (props) => (
+      <LastPriceCell symbol={props.row.getValue<string>("symbol")} />
+    ),
   },
   {
-    head: "PNL (ROI %)",
-    cell: (rowData) => <PnlRoiCell position={rowData} />,
+    id: "pnl",
+    header: "PNL (ROI %)",
+    cell: (props) => <PnlRoiCell position={props.row.original} />,
   },
   {
-    head: "Leverage",
-    cell: (rowData) => rowData.leverage,
+    accessorKey: "leverage",
+    header: "Leverage",
+    cell: (props) => props.getValue<number>(),
   },
   {
-    head: "Initial Margin",
-    cell: (rowData) => `$${rowData.initialMargin.toLocaleString()}`,
+    accessorKey: "initialMargin",
+    header: "Initial Margin",
+    cell: (props) => `$${props.getValue<number>().toLocaleString()}`,
   },
   {
-    head: "Liq. Price",
-    cell: (rowData) => `$${rowData.liquidationPrice.toLocaleString()}`,
+    accessorKey: "liquidationPrice",
+    header: "Liq. Price",
+    cell: (props) => `$${props.getValue<number>().toLocaleString()}`,
   },
   {
-    head: "Take Profit",
-    cell: (rowData) =>
-      rowData.takeProfitPrice
-        ? `$${rowData.takeProfitPrice.toLocaleString()}`
+    accessorKey: "takeProfitPrice",
+    header: "Take Profit",
+    cell: (props) =>
+      props.getValue<number>()
+        ? `$${props.getValue<number>().toLocaleString()}`
         : "-",
   },
   {
-    head: "Stop Loss",
-    cell: (rowData) =>
-      rowData.stopLossPrice
-        ? `$${rowData.stopLossPrice.toLocaleString()}`
+    accessorKey: "stopLossPrice",
+    header: "Stop Loss",
+    cell: (props) =>
+      props.getValue<number>()
+        ? `$${props.getValue<number>().toLocaleString()}`
         : "-",
   },
   {
-    head: "Created At",
-    cell: (rowData) => new Date(rowData.createdAt).toLocaleString(),
+    accessorKey: "createdAt",
+    header: "Created At",
+    cell: (props) => new Date(props.getValue<number>()).toLocaleString(),
   },
   {
-    head: "Actions",
-    cell: (rowData) => (
+    id: "actions",
+    header: "Actions",
+    cell: (props) => (
       <div className="flex gap-2 justify-center">
-        <SetTPSLDialogButton position={rowData} />
-        <ClosePositionButton position={rowData} />
+        <SetTPSLDialogButton position={props.row.original} />
+        <ClosePositionButton position={props.row.original} />
       </div>
     ),
   },
@@ -225,36 +231,11 @@ const columns: Column[] = [
 const PositionsTable = () => {
   const demoAccountPositions = useDemoAccountStore((state) => state.positions);
 
-  const demoAccountOpenPositions = demoAccountPositions.filter(
+  const data = demoAccountPositions.filter(
     (position) => position.status === PositionStatus.Open
   );
 
-  const heads = columns.map((column, i) => (
-    <TableHead key={i} className="text-center">
-      {column.head}
-    </TableHead>
-  ));
-
-  const cells = (position: Position) =>
-    columns.map((column, i) => (
-      <TableCell key={i} className="text-center">
-        {column.cell(position)}
-      </TableCell>
-    ));
-
-  return (
-    <Table>
-      <TableCaption>Your open trading positions.</TableCaption>
-      <TableHeader>
-        <TableRow>{heads}</TableRow>
-      </TableHeader>
-      <TableBody>
-        {demoAccountOpenPositions.map((position) => (
-          <TableRow key={position.id}>{cells(position)}</TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
+  return <DataTable data={data} columns={columns} />;
 };
 
 export default PositionsTable;
