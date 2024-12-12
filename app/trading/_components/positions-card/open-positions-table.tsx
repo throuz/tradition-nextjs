@@ -228,7 +228,7 @@ const columns: ColumnDef<Position>[] = [
   },
 ];
 
-const PositionsTable = () => {
+const OpenPositionsTable = () => {
   const demoAccountPositions = useDemoAccountStore((state) => state.positions);
 
   const data = demoAccountPositions.filter(
@@ -238,4 +238,4 @@ const PositionsTable = () => {
   return <DataTable data={data} columns={columns} />;
 };
 
-export default PositionsTable;
+export default OpenPositionsTable;
