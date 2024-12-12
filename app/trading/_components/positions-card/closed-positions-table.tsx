@@ -1,127 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { toast } from "sonner";
 
 import { DataTable } from "@/components/ui/data-table";
 import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
-import useLastPriceStream from "@/lib/streams/use-last-price-stream";
 import { OrderSide, Position, PositionStatus } from "@/lib/types";
-import { calculatePnl, cn } from "@/lib/utils";
-
-import ClosePositionButton from "./close-position-button";
-import SetTPSLDialogButton from "./set-tpsl-dialog-button";
-
-const LastPriceCell = ({ symbol }: { symbol: string }) => {
-  const lastPriceStream = useLastPriceStream(symbol);
-  if (lastPriceStream) {
-    return `$${lastPriceStream.toLocaleString()}`;
-  }
-  return "-";
-};
-
-const PnlRoiCell = ({ position }: { position: Position }) => {
-  const {
-    id,
-    symbol,
-    entryPrice,
-    size,
-    side,
-    takeProfitPrice,
-    stopLossPrice,
-    liquidationPrice,
-    initialMargin,
-  } = position;
-  const lastPriceStream = useLastPriceStream(symbol);
-  const demoAccountUpdateBalance = useDemoAccountStore(
-    (state) => state.updateBalance
-  );
-  const demoAccountUpdatePosition = useDemoAccountStore(
-    (state) => state.updatePosition
-  );
-
-  useEffect(() => {
-    if (!lastPriceStream) return;
-    const lastPrice = Number(lastPriceStream);
-    const isTPSLTriggered = (() => {
-      if (side === OrderSide.Buy) {
-        return (
-          (takeProfitPrice && lastPrice >= takeProfitPrice) ||
-          (stopLossPrice && lastPrice <= stopLossPrice)
-        );
-      }
-      if (side === OrderSide.Sell) {
-        return (
-          (takeProfitPrice && lastPrice <= takeProfitPrice) ||
-          (stopLossPrice && lastPrice >= stopLossPrice)
-        );
-      }
-      return false;
-    })();
-    const isLiqTriggered = (() => {
-      if (side === OrderSide.Buy) {
-        return lastPrice <= liquidationPrice;
-      }
-      if (side === OrderSide.Sell) {
-        return lastPrice >= liquidationPrice;
-      }
-      return false;
-    })();
-    if (isTPSLTriggered) {
-      const pnl = calculatePnl({ lastPrice, entryPrice, size, side });
-      demoAccountUpdateBalance(initialMargin + pnl);
-      demoAccountUpdatePosition(id, {
-        status: PositionStatus.Closed,
-        closePrice: lastPrice,
-        realizedPnL: pnl,
-        closedAt: Date.now(),
-      });
-      toast.success("Position closed successfully");
-    }
-    if (isLiqTriggered) {
-      demoAccountUpdatePosition(id, {
-        status: PositionStatus.Closed,
-        closePrice: lastPrice,
-        realizedPnL: -initialMargin,
-        closedAt: Date.now(),
-      });
-      toast.success("Position closed successfully");
-    }
-  }, [
-    demoAccountUpdateBalance,
-    demoAccountUpdatePosition,
-    entryPrice,
-    id,
-    initialMargin,
-    lastPriceStream,
-    liquidationPrice,
-    side,
-    size,
-    stopLossPrice,
-    takeProfitPrice,
-  ]);
-
-  if (!lastPriceStream) {
-    return "-";
-  }
-
-  const pnl = calculatePnl({
-    lastPrice: Number(lastPriceStream),
-    entryPrice: entryPrice,
-    size: size,
-    side: side,
-  });
-  const roi = (pnl / initialMargin) * 100;
-  const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(2)}`;
-  const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi).toFixed(2)}%`;
-
-  return (
-    <div
-      className={cn(pnl > 0 ? "text-green-500" : "text-red-500")}
-    >{`${formattedPnl} (${formattedRoi})`}</div>
-  );
-};
+import { cn } from "@/lib/utils";
 
 const columns: ColumnDef<Position>[] = [
   {
@@ -169,16 +53,30 @@ const columns: ColumnDef<Position>[] = [
     cell: (props) => `$${props.getValue<number>().toLocaleString()}`,
   },
   {
-    id: "lastPrice",
-    header: "Last Price",
-    cell: (props) => (
-      <LastPriceCell symbol={props.row.getValue<string>("symbol")} />
-    ),
+    accessorKey: "closePrice",
+    header: "Close Price",
+    cell: (props) => `$${props.getValue<number>().toLocaleString()}`,
   },
   {
-    id: "pnl",
+    accessorKey: "realizedPnL",
     header: "PNL (ROI %)",
-    cell: (props) => <PnlRoiCell position={props.row.original} />,
+    cell: (props) => {
+      const pnl = props.getValue<number>();
+      const initialMargin = props.row.getValue<number>("initialMargin");
+      const roi = (pnl / initialMargin) * 100;
+      const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(
+        2
+      )}`;
+      const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi).toFixed(
+        2
+      )}%`;
+
+      return (
+        <div
+          className={cn(pnl > 0 ? "text-green-500" : "text-red-500")}
+        >{`${formattedPnl} (${formattedRoi})`}</div>
+      );
+    },
   },
   {
     accessorKey: "leverage",
@@ -217,14 +115,9 @@ const columns: ColumnDef<Position>[] = [
     cell: (props) => new Date(props.getValue<number>()).toLocaleString(),
   },
   {
-    id: "actions",
-    header: "Actions",
-    cell: (props) => (
-      <div className="flex gap-2 justify-center">
-        <SetTPSLDialogButton position={props.row.original} />
-        <ClosePositionButton position={props.row.original} />
-      </div>
-    ),
+    accessorKey: "closedAt",
+    header: "Closed At",
+    cell: (props) => new Date(props.getValue<number>()).toLocaleString(),
   },
 ];
 
