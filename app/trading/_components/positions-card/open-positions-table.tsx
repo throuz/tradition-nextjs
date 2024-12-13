@@ -11,6 +11,7 @@ import { OrderSide, Position, PositionStatus } from "@/lib/types";
 import { calculatePnl, cn } from "@/lib/utils";
 
 import ClosePositionButton from "./close-position-button";
+import RiskManagementTrigger from "./risk-management-trigger";
 import SetTPSLDialogButton from "./set-tpsl-dialog-button";
 
 const LastPriceCell = ({ symbol }: { symbol: string }) => {
@@ -22,85 +23,8 @@ const LastPriceCell = ({ symbol }: { symbol: string }) => {
 };
 
 const PnlRoiCell = ({ position }: { position: Position }) => {
-  const {
-    id,
-    symbol,
-    entryPrice,
-    size,
-    side,
-    takeProfitPrice,
-    stopLossPrice,
-    liquidationPrice,
-    initialMargin,
-  } = position;
+  const { symbol, entryPrice, size, side, initialMargin } = position;
   const lastPriceStream = useLastPriceStream(symbol);
-  const demoAccountUpdateBalance = useDemoAccountStore(
-    (state) => state.updateBalance
-  );
-  const demoAccountUpdatePosition = useDemoAccountStore(
-    (state) => state.updatePosition
-  );
-
-  useEffect(() => {
-    if (!lastPriceStream) return;
-    const lastPrice = Number(lastPriceStream);
-    const isTPSLTriggered = (() => {
-      if (side === OrderSide.Buy) {
-        return (
-          (takeProfitPrice && lastPrice >= takeProfitPrice) ||
-          (stopLossPrice && lastPrice <= stopLossPrice)
-        );
-      }
-      if (side === OrderSide.Sell) {
-        return (
-          (takeProfitPrice && lastPrice <= takeProfitPrice) ||
-          (stopLossPrice && lastPrice >= stopLossPrice)
-        );
-      }
-      return false;
-    })();
-    const isLiqTriggered = (() => {
-      if (side === OrderSide.Buy) {
-        return lastPrice <= liquidationPrice;
-      }
-      if (side === OrderSide.Sell) {
-        return lastPrice >= liquidationPrice;
-      }
-      return false;
-    })();
-    if (isTPSLTriggered) {
-      const pnl = calculatePnl({ lastPrice, entryPrice, size, side });
-      demoAccountUpdateBalance(initialMargin + pnl);
-      demoAccountUpdatePosition(id, {
-        status: PositionStatus.Closed,
-        closePrice: lastPrice,
-        realizedPnL: pnl,
-        closedAt: Date.now(),
-      });
-      toast.success("Position closed successfully");
-    }
-    if (isLiqTriggered) {
-      demoAccountUpdatePosition(id, {
-        status: PositionStatus.Closed,
-        closePrice: lastPrice,
-        realizedPnL: -initialMargin,
-        closedAt: Date.now(),
-      });
-      toast.success("Position closed successfully");
-    }
-  }, [
-    demoAccountUpdateBalance,
-    demoAccountUpdatePosition,
-    entryPrice,
-    id,
-    initialMargin,
-    lastPriceStream,
-    liquidationPrice,
-    side,
-    size,
-    stopLossPrice,
-    takeProfitPrice,
-  ]);
 
   if (!lastPriceStream) {
     return "-";
@@ -235,7 +159,16 @@ const OpenPositionsTable = () => {
     (position) => position.status === PositionStatus.Open
   );
 
-  return <DataTable data={data} columns={columns} />;
+  const riskManagementTriggers = data.map((position) => (
+    <RiskManagementTrigger key={position.id} position={position} />
+  ));
+
+  return (
+    <>
+      {riskManagementTriggers}
+      <DataTable data={data} columns={columns} />
+    </>
+  );
 };
 
 export default OpenPositionsTable;
