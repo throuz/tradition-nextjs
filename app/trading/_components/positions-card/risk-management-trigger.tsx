@@ -87,7 +87,7 @@ const RiskManagementTrigger = ({ position }: { position: Position }) => {
     takeProfitPrice,
   ]);
 
-  return <></>;
+  return null;
 };
 
 export default RiskManagementTrigger;
