@@ -155,9 +155,9 @@ const columns: ColumnDef<Position>[] = [
 const OpenPositionsTable = () => {
   const demoAccountPositions = useDemoAccountStore((state) => state.positions);
 
-  const data = demoAccountPositions.filter(
-    (position) => position.status === PositionStatus.Open
-  );
+  const data = demoAccountPositions
+    .filter((position) => position.status === PositionStatus.Open)
+    .sort((a, b) => b.createdAt - a.createdAt);
 
   const riskManagementTriggers = data.map((position) => (
     <RiskManagementTrigger key={position.id} position={position} />

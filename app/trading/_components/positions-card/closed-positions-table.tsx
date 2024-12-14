@@ -124,9 +124,9 @@ const columns: ColumnDef<Position>[] = [
 const ClosedPositionsTable = () => {
   const demoAccountPositions = useDemoAccountStore((state) => state.positions);
 
-  const data = demoAccountPositions.filter(
-    (position) => position.status === PositionStatus.Closed
-  );
+  const data = demoAccountPositions
+    .filter((position) => position.status === PositionStatus.Closed)
+    .sort((a, b) => (b.closedAt ?? 0) - (a.closedAt ?? 0));
 
   return <DataTable data={data} columns={columns} />;
 };
