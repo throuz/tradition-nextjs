@@ -98,6 +98,7 @@ const usePlaceOrderForm = () => {
             orderSide,
             leverage,
             entryPrice: latestPrice,
+            decimalPlaces: priceDecimalDigits,
           });
           if (orderSide === OrderSide.Buy) {
             if (takeProfitPrice && takeProfitPrice <= latestPrice) {
@@ -118,9 +119,7 @@ const usePlaceOrderForm = () => {
               ctx.addIssue({
                 code: ZodIssueCode.custom,
                 path: ["stopLossPrice"],
-                message: `Stop Loss Price must be greater than ${liquidationPrice.toFixed(
-                  priceDecimalDigits
-                )}`,
+                message: `Stop Loss Price must be greater than ${liquidationPrice}`,
               });
             }
           }
@@ -143,9 +142,7 @@ const usePlaceOrderForm = () => {
               ctx.addIssue({
                 code: ZodIssueCode.custom,
                 path: ["stopLossPrice"],
-                message: `Stop Loss Price must be less than ${liquidationPrice.toFixed(
-                  priceDecimalDigits
-                )}`,
+                message: `Stop Loss Price must be less than ${liquidationPrice}`,
               });
             }
           }
@@ -189,11 +186,12 @@ const usePlaceOrderForm = () => {
           values;
         const tickerResponse = await fetchTicker(symbol);
         const entryPrice = Number(tickerResponse.price);
-        const size = (amount * leverage) / entryPrice;
+        const size = Number(((amount * leverage) / entryPrice).toFixed(8));
         const liquidationPrice = calculateLiqPrice({
           orderSide,
           leverage,
           entryPrice,
+          decimalPlaces: priceDecimalDigits,
         });
         const position: Position = {
           id: id,

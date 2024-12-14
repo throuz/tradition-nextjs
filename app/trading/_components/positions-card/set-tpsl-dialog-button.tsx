@@ -82,13 +82,8 @@ const SetTPSLDialogButton = ({ position }: SetTPSLDialogButtonProps) => {
       ),
     })
     .superRefine((values, ctx) => {
-      const { side, leverage, entryPrice } = position;
+      const { side, entryPrice, liquidationPrice } = position;
       const { takeProfitPrice, stopLossPrice } = values;
-      const liquidationPrice = calculateLiqPrice({
-        orderSide: side,
-        leverage,
-        entryPrice,
-      });
       if (takeProfitPrice || stopLossPrice) {
         if (side === OrderSide.Buy) {
           if (takeProfitPrice && takeProfitPrice <= entryPrice) {
@@ -109,9 +104,7 @@ const SetTPSLDialogButton = ({ position }: SetTPSLDialogButtonProps) => {
             ctx.addIssue({
               code: ZodIssueCode.custom,
               path: ["stopLossPrice"],
-              message: `Stop Loss Price must be greater than ${liquidationPrice.toFixed(
-                priceDecimalDigits
-              )}`,
+              message: `Stop Loss Price must be greater than ${liquidationPrice}`,
             });
           }
         }
@@ -134,9 +127,7 @@ const SetTPSLDialogButton = ({ position }: SetTPSLDialogButtonProps) => {
             ctx.addIssue({
               code: ZodIssueCode.custom,
               path: ["stopLossPrice"],
-              message: `Stop Loss Price must be less than ${liquidationPrice.toFixed(
-                priceDecimalDigits
-              )}`,
+              message: `Stop Loss Price must be less than ${liquidationPrice}`,
             });
           }
         }

@@ -25,14 +25,16 @@ export const calculateLiqPrice = ({
   orderSide,
   leverage,
   entryPrice,
+  decimalPlaces,
 }: {
   orderSide: OrderSide;
   leverage: number;
   entryPrice: number;
+  decimalPlaces: number;
 }): number => {
   return orderSide === OrderSide.Buy
-    ? entryPrice * (1 - 1 / leverage)
-    : entryPrice * (1 + 1 / leverage);
+    ? Number((entryPrice * (1 - 1 / leverage)).toFixed(decimalPlaces))
+    : Number((entryPrice * (1 + 1 / leverage)).toFixed(decimalPlaces));
 };
 
 export const calculatePnl = ({
