@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { toast } from "sonner";
+import { format } from "date-fns";
 
 import { DataTable } from "@/components/ui/data-table";
 import useDemoAccountStore from "@/lib/stores/use-demo-account-store";
@@ -17,7 +16,7 @@ import SetTPSLDialogButton from "./set-tpsl-dialog-button";
 const LastPriceCell = ({ symbol }: { symbol: string }) => {
   const lastPriceStream = useLastPriceStream(symbol);
   if (lastPriceStream) {
-    return `$${lastPriceStream.toLocaleString()}`;
+    return `$${Number(lastPriceStream)}`;
   }
   return "-";
 };
@@ -79,18 +78,15 @@ const columns: ColumnDef<Position>[] = [
     header: "Size",
     cell: (props) => {
       const size = props.getValue<number>();
-      const formatedSize = size.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-      });
       const symbol = props.row.getValue<string>("symbol");
       const formatedSymbol = symbol.replace(/USDT$/, "");
-      return `${formatedSize} ${formatedSymbol}`;
+      return `${size} ${formatedSymbol}`;
     },
   },
   {
     accessorKey: "entryPrice",
     header: "Entry Price",
-    cell: (props) => `$${props.getValue<number>().toLocaleString()}`,
+    cell: (props) => `$${props.getValue<number>()}`,
   },
   {
     id: "lastPrice",
@@ -112,33 +108,30 @@ const columns: ColumnDef<Position>[] = [
   {
     accessorKey: "initialMargin",
     header: "Initial Margin",
-    cell: (props) => `$${props.getValue<number>().toLocaleString()}`,
+    cell: (props) => `$${props.getValue<number>()}`,
   },
   {
     accessorKey: "liquidationPrice",
     header: "Liq. Price",
-    cell: (props) => `$${props.getValue<number>().toLocaleString()}`,
+    cell: (props) => `$${props.getValue<number>()}`,
   },
   {
     accessorKey: "takeProfitPrice",
     header: "Take Profit",
     cell: (props) =>
-      props.getValue<number>()
-        ? `$${props.getValue<number>().toLocaleString()}`
-        : "-",
+      props.getValue<number>() ? `$${props.getValue<number>()}` : "-",
   },
   {
     accessorKey: "stopLossPrice",
     header: "Stop Loss",
     cell: (props) =>
-      props.getValue<number>()
-        ? `$${props.getValue<number>().toLocaleString()}`
-        : "-",
+      props.getValue<number>() ? `$${props.getValue<number>()}` : "-",
   },
   {
     accessorKey: "createdAt",
     header: "Created At",
-    cell: (props) => new Date(props.getValue<number>()).toLocaleString(),
+    cell: (props) =>
+      format(new Date(props.getValue<number>()), "yyyy-MM-dd HH:mm:ss"),
   },
   {
     id: "actions",
