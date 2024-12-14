@@ -61,17 +61,13 @@ const columns: ColumnDef<Position>[] = [
     cell: (props) => {
       const pnl = props.getValue<number>();
       const initialMargin = props.row.getValue<number>("initialMargin");
-      const roi = (pnl / initialMargin) * 100;
-      const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl).toFixed(
-        2
-      )}`;
-      const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi).toFixed(
-        2
-      )}%`;
+      const roi = Number(((pnl / initialMargin) * 100).toFixed(2));
+      const formattedPnl = `${pnl >= 0 ? "+" : "-"}$${Math.abs(pnl)}`;
+      const formattedRoi = `${roi >= 0 ? "+" : "-"}${Math.abs(roi)}%`;
 
       return (
         <div
-          className={cn(pnl > 0 ? "text-green-500" : "text-red-500")}
+          className={cn(pnl >= 0 ? "text-green-500" : "text-red-500")}
         >{`${formattedPnl} (${formattedRoi})`}</div>
       );
     },

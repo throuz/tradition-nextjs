@@ -49,8 +49,8 @@ export const calculatePnl = ({
   side: OrderSide;
 }): number => {
   return side === OrderSide.Buy
-    ? (lastPrice - entryPrice) * size
-    : (lastPrice - entryPrice) * size * -1;
+    ? Number(((lastPrice - entryPrice) * size).toFixed(2))
+    : Number(((lastPrice - entryPrice) * size * -1).toFixed(2));
 };
 
 export const formatWithSign = (value: number): string => {
